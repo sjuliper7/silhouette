@@ -27,5 +27,5 @@ func LoadConfig() {
 func InitConfig() {
 
 	var cf Config
-	// cf.initDatabase()
+	cf.initDatabase()
 }

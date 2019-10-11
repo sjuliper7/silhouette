@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/sjuliper7/silhouette/services/user-service/config"
 )
 
@@ -11,6 +9,5 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Hello")
 	config.InitConfig()
 }
