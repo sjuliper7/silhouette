@@ -2,9 +2,8 @@ package config
 
 import (
 	"database/sql"
-	"log"
-
 	"github.com/joho/godotenv"
+	"log"
 )
 
 //Config is struct to access all config
@@ -28,4 +27,5 @@ func InitConfig() {
 
 	var cf Config
 	cf.initDatabase()
+	cf.initService()
 }
