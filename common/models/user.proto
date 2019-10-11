@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package models;
+
+
+message User{
+    uint64 id = 1;
+    string name = 2;
+    string last_name = 3;
+}
+
+message UserList {
+    repeated User list = 1;
+}
+
+
+import "google/protobuf/empty.proto";
+
+service Users {
+    rpc List(google.protobuf.Empty) returns (UserList){}
+}
+
