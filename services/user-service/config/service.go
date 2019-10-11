@@ -1,8 +1,10 @@
 package config
 
 import (
+	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/models"
 	"google.golang.org/grpc"
+	"log"
 
 	"github.com/sjuliper7/silhouette/services/user-service/delivery"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
@@ -18,4 +20,7 @@ func (cf *Config) initService() {
 	userServer := delivery.NewUserServer(usecase)
 
 	models.RegisterUsersServer(svr, userServer)
+	log.Println("Starting RPC server at", config.SERVICE_USER_PORT)
+
+	//next running the to http
 }
