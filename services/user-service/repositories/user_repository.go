@@ -19,7 +19,7 @@ func NewMysqlRepository(conn *sql.DB) Repository {
 	return &mysqlRepository{conn}
 }
 
-func (repo mysqlRepository) GetAlluser() []models.User {
+func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
 	sql := queries.Q(queries.QueryGetAllUser, map[string]string{})
 	rows, err := repo.Conn.Query(sql)
 	if err != nil {
@@ -28,19 +28,18 @@ func (repo mysqlRepository) GetAlluser() []models.User {
 
 	defer rows.Close()
 
-	var users []models.User
-
 	for rows.Next() {
 		var user = models.User{}
 		var err = rows.Scan(&user.ID, &user.Name, &user.LastName)
 
 		if err != nil {
-			log.Fatalln(err.Error)
+			log.Println("Failed when getting result with params %+v ", err)
+			return nil, err
 		}
 
 		users = append(users, user)
 
 	}
 
-	return users
+	return users, nil
 }

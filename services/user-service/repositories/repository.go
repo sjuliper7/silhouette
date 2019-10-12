@@ -6,5 +6,5 @@ import (
 
 //Repository declaration type interface
 type Repository interface {
-	GetAlluser() []models.User
+	GetAlluser() (users []models.User, err error)
 }
