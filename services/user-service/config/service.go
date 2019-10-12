@@ -1,18 +1,24 @@
 package config
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/models"
-	"google.golang.org/grpc"
-	"log"
-
 	"github.com/sjuliper7/silhouette/services/user-service/delivery"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
+	"google.golang.org/grpc"
+	"log"
+	"net"
+	"net/http"
 )
 
 func (cf *Config) initService() {
+	//initRpcService(cf)
+	initRestService(cf)
+}
 
+func initRpcService(cf *Config) {
 	repo := repositories.NewMysqlRepository(cf.DB)
 	usecase := usecase.NewUserUsecase(repo)
 
@@ -23,4 +29,24 @@ func (cf *Config) initService() {
 	log.Println("Starting RPC server at", config.SERVICE_USER_PORT)
 
 	//next running the to http
+	net, err := net.Listen("tcp", config.SERVICE_USER_PORT)
+	if err != nil {
+		log.Fatalf("could not listen to %s: %v", config.SERVICE_USER_PORT, err)
+	}
+
+	log.Fatalln(svr.Serve(net))
+}
+
+func initRestService(cf *Config) {
+	repo := repositories.NewMysqlRepository(cf.DB)
+	usecase := usecase.NewUserUsecase(repo)
+
+	router := mux.NewRouter()
+	userRest := delivery.NewUserServerRest(usecase)
+	router.HandleFunc("/users", userRest.Resource).Methods("GET")
+
+	log.Println("Starting Rest API at", config.REST_USER_PORT)
+
+	http.ListenAndServe(config.REST_USER_PORT, router)
+
 }
