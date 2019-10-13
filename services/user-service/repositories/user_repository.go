@@ -5,8 +5,6 @@ import (
 
 	"log"
 
-	"github.com/sjuliper7/silhouette/services/user-service/repositories/queries"
-
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 )
 
@@ -20,7 +18,7 @@ func NewMysqlRepository(conn *sql.DB) Repository {
 }
 
 func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
-	sql := queries.Q(queries.QueryGetAllUser, map[string]string{})
+	sql := `SELECT id, name, last_name FROM users`
 	rows, err := repo.Conn.Query(sql)
 	if err != nil {
 		log.Fatalln(err.Error)
@@ -33,7 +31,7 @@ func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
 		var err = rows.Scan(&user.ID, &user.Name, &user.LastName)
 
 		if err != nil {
-			log.Println("Failed when getting result with params %+v ", err)
+			log.Println("Failed when getting result with params %v ", err)
 			return nil, err
 		}
 

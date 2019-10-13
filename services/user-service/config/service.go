@@ -18,8 +18,8 @@ func (cf *Config) initService() {
 	initRestService(cf)
 }
 
-func initRpcService(cf *Config) {
-	repo := repositories.NewMysqlRepository(cf.DB)
+func initRpcService(cg *Config) {
+	repo := repositories.NewMysqlRepository(cg.DB)
 	usecase := usecase.NewUserUsecase(repo)
 
 	svr := grpc.NewServer()
@@ -37,8 +37,8 @@ func initRpcService(cf *Config) {
 	log.Fatalln(svr.Serve(net))
 }
 
-func initRestService(cf *Config) {
-	repo := repositories.NewMysqlRepository(cf.DB)
+func initRestService(cg *Config) {
+	repo := repositories.NewMysqlRepository(cg.DB)
 	usecase := usecase.NewUserUsecase(repo)
 
 	router := mux.NewRouter()
