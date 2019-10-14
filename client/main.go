@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sjuliper7/silhouette/common/config"
-	"github.com/sjuliper7/silhouette/common/models"
+	"github.com/sjuliper7/silhouette/common/protocs"
 	"google.golang.org/grpc"
 	"log"
 )
@@ -22,7 +22,7 @@ func main() {
 	fmt.Println(result)
 }
 
-func connectToUserService() models.UsersClient {
+func connectToUserService() protocs.UsersClient {
 	userPort := config.SERVICE_USER_PORT
 	conn, err := grpc.Dial(userPort, grpc.WithInsecure())
 
@@ -30,5 +30,5 @@ func connectToUserService() models.UsersClient {
 		log.Fatal("could not connect to", userPort, err)
 	}
 
-	return models.NewUsersClient(conn)
+	return protocs.NewUsersClient(conn)
 }
