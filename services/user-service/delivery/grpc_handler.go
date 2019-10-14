@@ -3,13 +3,13 @@ package delivery
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/sjuliper7/silhouette/common/models"
+	"github.com/sjuliper7/silhouette/common/protocs"
 	"log"
 )
 
-func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, error) {
-	var userList models.UserList
-	var users []*models.User
+func (us UserServer) List(context.Context, *empty.Empty) (*protocs.UserList, error) {
+	var userList protocs.UserList
+	var users []*protocs.User
 
 	uu, err := us.usecase.GetAlluser()
 
@@ -19,10 +19,12 @@ func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, erro
 	}
 
 	for _, u := range uu {
-		var user models.User
+		var user protocs.User
 		user.Id = u.ID
+		user.Email = u.Email
+		user.Username = u.Username
 		user.Name = u.Name
-		user.LastName = u.LastName
+		user.Role = u.Role
 
 		users = append(users, &user)
 	}
