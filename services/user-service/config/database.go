@@ -1,7 +1,7 @@
 package config
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
 
@@ -10,7 +10,7 @@ import (
 
 //InitDatabase is function to create connection to Database
 func (cf *Config) initDatabase() {
-	db, err := sql.Open("mysql", populateStringConnection())
+	db, err := sqlx.Connect("mysql", populateStringConnection())
 
 	if err != nil {
 		log.Fatal(err)

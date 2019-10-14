@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/gorilla/mux"
 	"github.com/sjuliper7/silhouette/common/config"
-	"github.com/sjuliper7/silhouette/common/models"
+	"github.com/sjuliper7/silhouette/common/protocs"
 	"github.com/sjuliper7/silhouette/services/user-service/delivery"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
@@ -25,7 +25,7 @@ func initRpcService(cg *Config) {
 	svr := grpc.NewServer()
 	userServer := delivery.NewUserServer(usecase)
 
-	models.RegisterUsersServer(svr, userServer)
+	protocs.RegisterUsersServer(svr, userServer)
 	log.Println("Starting RPC server at", config.SERVICE_USER_PORT)
 
 	//next running the to http

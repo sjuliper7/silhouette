@@ -1,14 +1,14 @@
 package config
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"log"
 )
 
 //Config is struct to access all config
 type Config struct {
-	DB *sql.DB
+	DB *sqlx.DB
 }
 
 //LoadConfig is function to load config
