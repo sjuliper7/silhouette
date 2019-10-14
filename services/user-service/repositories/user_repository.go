@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 
 	"log"
 
@@ -9,29 +9,27 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	Conn *sqlx.DB
 }
 
 //NewMysqlRepository is to create new instance repository
-func NewMysqlRepository(conn *sql.DB) Repository {
+func NewMysqlRepository(conn *sqlx.DB) Repository {
 	return &mysqlRepository{conn}
 }
 
 func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
-	sql := `SELECT id, name, last_name FROM users`
-	rows, err := repo.Conn.Query(sql)
+	sql := `SELECT id, username, email, name, role FROM users`
+	rows, err := repo.Conn.Queryx(sql)
 	if err != nil {
 		log.Fatalln(err.Error)
 	}
 
-	defer rows.Close()
-
 	for rows.Next() {
-		var user = models.User{}
-		var err = rows.Scan(&user.ID, &user.Name, &user.LastName)
+		var user models.User
+		var err = rows.StructScan(&user)
 
 		if err != nil {
-			log.Println("Failed when getting result with params %v ", err)
+			log.Println("Failed when getting result with params %+v ", err)
 			return nil, err
 		}
 
