@@ -26,7 +26,11 @@ func (usrest UserServerRest) Resource(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		if len(params) == 0 {
 			usrest.fetchUser(w, r)
+		} else {
+			usrest.getUser(w, r)
 		}
+	case http.MethodPost:
+		usrest.postUser(w, r)
 	default:
 		respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
