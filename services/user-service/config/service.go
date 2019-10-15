@@ -43,7 +43,8 @@ func initRestService(cg *Config) {
 
 	router := mux.NewRouter()
 	userRest := delivery.NewUserServerRest(usecase)
-	router.HandleFunc("/users", userRest.Resource).Methods("GET")
+	router.HandleFunc("/users", userRest.Resource).Methods("GET", "POST")
+	router.HandleFunc("/users/{id}", userRest.Resource).Methods("GET")
 
 	log.Println("Starting Rest API at", config.REST_USER_PORT)
 
