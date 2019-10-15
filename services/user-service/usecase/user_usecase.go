@@ -24,3 +24,23 @@ func (uc userUsecase) GetAlluser() (users []models.User, err error) {
 
 	return users, err
 }
+func (uc userUsecase) AddUser(user *models.User) (err error) {
+
+	err = uc.repo.AddUser(user)
+	if err != nil {
+		log.Println("[usecase][AddUser] Error when calling repository to save")
+	}
+
+	return nil
+}
+
+func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
+	user, err = uc.repo.GetUser(userID)
+
+	if err != nil {
+		log.Println("[usecase][GetUser] Error when calling repository to get user")
+		return user, err
+	}
+
+	return user, nil
+}
