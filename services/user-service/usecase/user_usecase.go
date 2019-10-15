@@ -44,3 +44,14 @@ func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
 
 	return user, nil
 }
+
+func (uc userUsecase) UpdateUser(user *models.User) (err error){
+
+	err = uc.repo.UpdateUser(user)
+	if err != nil {
+		log.Println("[usecase][UpdateUser] Error when calling repository to update user")
+		return err
+	}
+
+	return nil
+}

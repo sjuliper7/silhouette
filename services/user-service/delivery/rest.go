@@ -31,6 +31,8 @@ func (usrest UserServerRest) Resource(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		usrest.postUser(w, r)
+	case http.MethodPut:
+		usrest.updateUser(w, r)
 	default:
 		respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}

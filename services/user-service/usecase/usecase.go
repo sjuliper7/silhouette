@@ -7,4 +7,5 @@ type UserUsecase interface {
 	GetAlluser() (users []models.User, err error)
 	AddUser(user *models.User) (err error)
 	GetUser(userID int64) (user models.User, err error)
+	UpdateUser(user *models.User) (err error)
 }

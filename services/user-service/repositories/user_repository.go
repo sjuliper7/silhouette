@@ -74,3 +74,23 @@ func (repo mysqlRepository) GetUser(userID int64) (user models.User, err error) 
 
 	return user, nil
 }
+
+func (repo mysqlRepository) UpdateUser(user *models.User) (err error)  {
+	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ? WHERE id=?`
+
+	stmt, err := repo.Conn.Preparex(sql)
+	if err != nil{
+		log.Println("Error when prepare the query %v", err)
+		return err
+	}
+
+	_ ,err = stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.ID)
+
+	if err != nil {
+		log.Println("Error when prepare the query %v", err)
+		return err
+	}
+
+	return nil
+
+}
