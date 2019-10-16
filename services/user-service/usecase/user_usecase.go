@@ -55,3 +55,14 @@ func (uc userUsecase) UpdateUser(user *models.User) (err error){
 
 	return nil
 }
+
+func (uc userUsecase) DeleteUser(userID int64) (deleted bool,err error) {
+	deleted, err = uc.repo.DeleteUser(userID)
+
+	if err != nil {
+		log.Println("[usecase][Delete] Error when calling repository to delete user")
+		return false, err
+	}
+
+	return deleted, nil
+}

@@ -18,7 +18,7 @@ func NewMysqlRepository(conn *sqlx.DB) Repository {
 }
 
 func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
-	sql := `SELECT id, username, email, name, role FROM users`
+	sql := `SELECT id, username, email, name, role FROM users where is_active = true`
 	rows, err := repo.Conn.Queryx(sql)
 	if err != nil {
 		log.Fatalln(err.Error)
@@ -47,7 +47,7 @@ func (repo mysqlRepository) AddUser(user *models.User) (err error) {
 	var temp int64
 	temp, err = result.LastInsertId()
 	if err != nil {
-		log.Println("Error when inserting values ", err)
+		log.Println("Error when inserting values %+v", err)
 		return err
 	}
 
@@ -58,18 +58,16 @@ func (repo mysqlRepository) AddUser(user *models.User) (err error) {
 
 func (repo mysqlRepository) GetUser(userID int64) (user models.User, err error) {
 
-	sql := `SELECT id, username, email, name, role FROM users where id = ?`
-
+	sql := `SELECT id, username, email, name, role FROM users where is_active = true and id = ?`
 	stmt, err := repo.Conn.Preparex(sql)
 
 	if err != nil {
-		log.Println("Error when prepare the query %v", err)
+		log.Println("Error when prepare the query %+v", err)
 	}
 
 	err = stmt.Get(&user, userID)
-
 	if err != nil {
-		log.Println("Error when getting the value %v", err)
+		log.Println("Error when getting the value %+v", err)
 	}
 
 	return user, nil
@@ -80,17 +78,34 @@ func (repo mysqlRepository) UpdateUser(user *models.User) (err error)  {
 
 	stmt, err := repo.Conn.Preparex(sql)
 	if err != nil{
-		log.Println("Error when prepare the query %v", err)
+		log.Println("Error when prepare the query %+v", err)
 		return err
 	}
-
 	_ ,err = stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.ID)
 
 	if err != nil {
-		log.Println("Error when prepare the query %v", err)
+		log.Println("Error when exec the query with value %+v", err)
 		return err
 	}
 
 	return nil
 
+}
+
+func (repo mysqlRepository) DeleteUser(userID int64) (deleted bool,err error) {
+	sql := `UPDATE users SET is_active = false where id =?`
+
+	stmt, err := repo.Conn.Preparex(sql)
+	if err != nil{
+		log.Println("Error when prepare the query %+v", err)
+		return false, err
+	}
+	_ ,err = stmt.Exec(userID)
+
+	if err != nil {
+		log.Println("Error when exec the query with value %+v", err)
+		return false, err
+	}
+
+	return true,nil
 }

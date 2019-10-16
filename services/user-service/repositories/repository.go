@@ -10,4 +10,5 @@ type Repository interface {
 	AddUser(user *models.User) (err error)
 	GetUser(userID int64) (user models.User, err error)
 	UpdateUser(user *models.User) (err error)
+	DeleteUser(userID int64) (deleted bool,err error)
 }

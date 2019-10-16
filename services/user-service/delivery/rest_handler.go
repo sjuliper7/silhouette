@@ -55,13 +55,14 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request){
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
-	user, err := usr.usecase.GetUser(int64(id))
-
 	if err != nil {
 		log.Println("Error when casting getting user")
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
+	user := models.User{}
+
+	user.ID = uint64(id)
 	user.Username = r.FormValue("username")
 	user.Email = r.FormValue("email")
 	user.Name = r.FormValue("name")
@@ -74,4 +75,22 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request){
 	}
 
 	respondWithJSON(w, http.StatusOK, user)
+}
+
+func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request){
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Println("Error when casting getting user")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	deleted, err := usr.usecase.DeleteUser(int64(id))
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	respondWithJSON(w, http.StatusOK, deleted)
 }
