@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package protocs;
+
+import "google/protobuf/empty.proto";
+
+message Profile{
+    int64 ID = 1;
+    int64 UserID = 2;
+    string Address = 3;
+    string WorkAt = 4;
+    string PhoneNumber = 5;
+    string Gender = 6;
+    bool IsActive = 7;
+}
+
+message UserGetProfileArguments {
+    int64 ID = 1;
+    int64 UserID = 2;
+    string Address = 3;
+    string WorkAt = 4;
+    string PhoneNumber = 5;
+    string Gender = 6;
+}
+
+service Users {
+    rpc GetProfile(UserGetProfileArguments) returns (Profile){}
+    rpc AddProfile(UserGetProfileArguments) returns (Profile){}
+    rpc UpdateProfile(UserGetProfileArguments) returns (Profile){}
+    rpc DeleteProfile(UserGetProfileArguments) returns (Profile){}
+}
+
+

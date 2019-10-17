@@ -2,13 +2,12 @@ syntax = "proto3";
 
 package protocs;
 
-
 message User{
-    uint64 id = 1;
-    string username = 2;
-    string email = 3;
-    string name = 4;
-    string role = 5;
+    uint64 ID = 1;
+    string Username = 2;
+    string Email = 3;
+    string Name = 4;
+    string Role = 5;
 }
 
 message UserList {
