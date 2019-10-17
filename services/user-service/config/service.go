@@ -4,7 +4,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
-	"github.com/sjuliper7/silhouette/services/user-service/delivery"
+	"github.com/sjuliper7/silhouette/services/user-service/delivery/grpc_delivery"
+	"github.com/sjuliper7/silhouette/services/user-service/delivery/rest"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
 	"google.golang.org/grpc"
@@ -23,7 +24,7 @@ func initRpcService(cg *Config) {
 	usecase := usecase.NewUserUsecase(repo)
 
 	svr := grpc.NewServer()
-	userServer := delivery.NewUserServer(usecase)
+	userServer := grpc_delivery.NewUserServer(usecase)
 
 	protocs.RegisterUsersServer(svr, userServer)
 	log.Println("Starting RPC server at", config.SERVICE_USER_PORT)
@@ -42,7 +43,7 @@ func initRestService(cg *Config) {
 	usecase := usecase.NewUserUsecase(repo)
 
 	router := mux.NewRouter()
-	userRest := delivery.NewUserServerRest(usecase)
+	userRest := rest.NewUserServerRest(usecase)
 	router.HandleFunc("/users", userRest.Resource).Methods("GET", "POST")
 	router.HandleFunc("/users/{id}", userRest.Resource).Methods("GET", "PUT", "DELETE")
 
