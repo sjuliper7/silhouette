@@ -20,7 +20,7 @@ func (us UserServer) List(context.Context, *empty.Empty) (*protocs.UserList, err
 
 	for _, u := range uu {
 		var user protocs.User
-		user.Id = u.ID
+		user.ID = u.ID
 		user.Email = u.Email
 		user.Username = u.Username
 		user.Name = u.Name
