@@ -23,7 +23,7 @@ message UserGetProfileArguments {
     string Gender = 6;
 }
 
-service Users {
+service Profiles {
     rpc GetProfile(UserGetProfileArguments) returns (Profile){}
     rpc AddProfile(UserGetProfileArguments) returns (Profile){}
     rpc UpdateProfile(UserGetProfileArguments) returns (Profile){}
