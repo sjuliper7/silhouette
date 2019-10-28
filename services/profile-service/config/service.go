@@ -3,21 +3,21 @@ package config
 import (
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
-	"github.com/sjuliper7/silhouette/services/profile-service/delivery"
+	grpc2 "github.com/sjuliper7/silhouette/services/profile-service/delivery/grpc"
+	"github.com/sjuliper7/silhouette/services/profile-service/repositories/mysql"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 
-	"github.com/sjuliper7/silhouette/services/profile-service/repositories"
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"
 )
 
 func (cf *Config) initService() {
-	repo := repositories.NewMysqlRepository(cf.DB)
-	usecase := usecase.NewProfileUsecase(repo)
+	repo := mysql.NewMysqlProfileRepository(cf.DB)
+	profileUc := usecase.NewProfileUsecase(repo)
 
 	svr := grpc.NewServer()
-	profileServer := delivery.NewProfileServer(usecase)
+	profileServer := grpc2.NewProfileServer(profileUc)
 	//
 	protocs.RegisterProfilesServer(svr, profileServer)
 	log.Println("Starting RPC server at", config.SERVICE_PROFILE_PORT)
