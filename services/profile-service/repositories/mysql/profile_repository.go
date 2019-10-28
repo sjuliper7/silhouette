@@ -1,8 +1,9 @@
-package repositories
+package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
+	"github.com/sjuliper7/silhouette/services/profile-service/repositories"
 	"log"
 )
 
@@ -10,7 +11,7 @@ type mysqlRepository struct {
 	Conn *sqlx.DB
 }
 
-func NewMysqlRepository(conn *sqlx.DB) Repository {
+func NewMysqlProfileRepository(conn *sqlx.DB) repositories.Repository {
 	return &mysqlRepository{Conn: conn}
 }
 
