@@ -1,4 +1,4 @@
-package delivery
+package grpc
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 func (ps ProfileServer) GetProfile(ctx context.Context, params *protocs.UserGetProfileArguments) (*protocs.Profile, error) {
 	UserID := params.UserID
-	pf, err := ps.usecase.GetUser(UserID)
+	pf, err := ps.profileUc.GetProfile(UserID)
 
 	if err != nil {
 		log.Println("Failed when call [usecase][GetProfile]")
