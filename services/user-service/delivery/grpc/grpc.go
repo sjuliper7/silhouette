@@ -1,4 +1,4 @@
-package grpc_delivery
+package grpc
 
 import (
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
