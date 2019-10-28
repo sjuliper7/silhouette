@@ -1,7 +1,8 @@
-package repositories
+package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 
 	"log"
 
@@ -13,7 +14,7 @@ type mysqlRepository struct {
 }
 
 //NewMysqlRepository is to create new instance repository
-func NewMysqlRepository(conn *sqlx.DB) Repository {
+func NewMysqlRepository(conn *sqlx.DB) repositories.UserRepository {
 	return &mysqlRepository{conn}
 }
 
@@ -73,15 +74,15 @@ func (repo mysqlRepository) GetUser(userID int64) (user models.User, err error) 
 	return user, nil
 }
 
-func (repo mysqlRepository) UpdateUser(user *models.User) (err error)  {
+func (repo mysqlRepository) UpdateUser(user *models.User) (err error) {
 	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ? WHERE id=?`
 
 	stmt, err := repo.Conn.Preparex(sql)
-	if err != nil{
+	if err != nil {
 		log.Println("Error when prepare the query %+v", err)
 		return err
 	}
-	_ ,err = stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.ID)
+	_, err = stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.ID)
 
 	if err != nil {
 		log.Println("Error when exec the query with value %+v", err)
@@ -92,20 +93,20 @@ func (repo mysqlRepository) UpdateUser(user *models.User) (err error)  {
 
 }
 
-func (repo mysqlRepository) DeleteUser(userID int64) (deleted bool,err error) {
+func (repo mysqlRepository) DeleteUser(userID int64) (deleted bool, err error) {
 	sql := `UPDATE users SET is_active = false where id =?`
 
 	stmt, err := repo.Conn.Preparex(sql)
-	if err != nil{
+	if err != nil {
 		log.Println("Error when prepare the query %+v", err)
 		return false, err
 	}
-	_ ,err = stmt.Exec(userID)
+	_, err = stmt.Exec(userID)
 
 	if err != nil {
 		log.Println("Error when exec the query with value %+v", err)
 		return false, err
 	}
 
-	return true,nil
+	return true, nil
 }
