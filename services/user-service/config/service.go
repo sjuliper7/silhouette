@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
-	"github.com/sjuliper7/silhouette/services/user-service/delivery/grpc_"
+	grpc_ "github.com/sjuliper7/silhouette/services/user-service/delivery/grpc"
 	"github.com/sjuliper7/silhouette/services/user-service/delivery/rest"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories/mysql"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories/services"
