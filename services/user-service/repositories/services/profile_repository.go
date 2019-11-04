@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
@@ -40,12 +41,13 @@ func (repo profileRepository) GetProfile(UserID int64) (profile models.Profile, 
 		return profile, err
 	}
 
-	profile.ID = result.ID
-	profile.UserId = result.UserID
-	profile.Gender = profile.Gender
-	profile.Address = profile.Address
-	profile.PhoneNumber = profile.PhoneNumber
-	profile.WorkAt = profile.WorkAt
+	temp, err := json.Marshal(result)
+	if err != nil {
+		log.Println("[repository][profile-service][GetProfile] error when marshall to json")
+		return profile, err
+	}
+
+	json.Unmarshal(temp, &profile)
 
 	return profile, nil
 }
