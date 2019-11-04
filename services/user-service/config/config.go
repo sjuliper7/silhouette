@@ -3,12 +3,15 @@ package config
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+
 	"log"
 )
 
 //Config is struct to access all config
 type Config struct {
-	DB *sqlx.DB
+	DB            *sqlx.DB
+	KafkaProducer *kafka.Producer
 }
 
 //LoadConfig is function to load config
