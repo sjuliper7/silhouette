@@ -16,3 +16,7 @@ type UserRepository interface {
 type ProfileRepository interface {
 	GetProfile(UserID int64) (profile models.Profile, err error)
 }
+
+type KafkaRepository interface {
+	SendMessage(profile *models.Profile) (err error)
+}
