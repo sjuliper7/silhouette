@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
 	grpc_ "github.com/sjuliper7/silhouette/services/user-service/delivery/grpc"
@@ -48,7 +49,7 @@ func initRestService(cg *Config) {
 	userRepo := mysql.NewMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
 	if err != nil {
-		log.Println("Error when to connect grpc to profile service")
+		logrus.Println("Error when to connect grpc to profile service")
 	}
 
 	usecase := usecase.NewUserUsecase(userRepo, profileRepo)
@@ -58,7 +59,7 @@ func initRestService(cg *Config) {
 	router.HandleFunc("/users", userRest.Resource).Methods("GET", "POST")
 	router.HandleFunc("/users/{id}", userRest.Resource).Methods("GET", "PUT", "DELETE")
 
-	log.Println("Starting Rest API at", config.REST_USER_PORT)
+	logrus.Println("Starting Rest API at", config.REST_USER_PORT)
 
 	http.ListenAndServe(config.REST_USER_PORT, router)
 

@@ -3,12 +3,12 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"google.golang.org/grpc"
-	"log"
 )
 
 type profileRepository struct {
@@ -21,7 +21,7 @@ func NewProfileRepository() (repositories.ProfileRepository, error) {
 	conn, err := grpc.Dial(profilePort, grpc.WithInsecure())
 
 	if err != nil {
-		log.Fatalln("Could not connect to profile service", profilePort)
+		logrus.Fatalln("Could not connect to profile service", profilePort)
 		return nil, err
 	}
 
@@ -37,13 +37,13 @@ func (repo profileRepository) GetProfile(UserID int64) (profile models.Profile, 
 	})
 
 	if err != nil {
-		log.Println("[repository][profile-service][GetProfile] while grpc GetProfile")
+		logrus.Println("[repository][profile-service][GetProfile] while grpc GetProfile")
 		return profile, err
 	}
 
 	temp, err := json.Marshal(result)
 	if err != nil {
-		log.Println("[repository][profile-service][GetProfile] error when marshall to json")
+		logrus.Println("[repository][profile-service][GetProfile] error when marshall to json")
 		return profile, err
 	}
 

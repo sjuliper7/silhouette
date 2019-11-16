@@ -20,21 +20,21 @@ func NewUserServerRest(uc usecase.UserUsecase) UserServerRest {
 	return UserServerRest{usecase: uc}
 }
 
-func (usrest UserServerRest) Resource(w http.ResponseWriter, r *http.Request) {
+func (usRest UserServerRest) Resource(w http.ResponseWriter, r *http.Request) {
 	switch m := r.Method; m {
 	case http.MethodGet:
 		params := mux.Vars(r)
 		if len(params) == 0 {
-			usrest.fetchUser(w, r)
+			usRest.fetchUser(w, r)
 		} else {
-			usrest.getUser(w, r)
+			usRest.getUser(w, r)
 		}
 	case http.MethodPost:
-		usrest.postUser(w, r)
+		usRest.postUser(w, r)
 	case http.MethodPut:
-		usrest.updateUser(w, r)
+		usRest.updateUser(w, r)
 	case http.MethodDelete:
-		usrest.deleteUser(w, r)
+		usRest.deleteUser(w, r)
 	default:
 		respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}

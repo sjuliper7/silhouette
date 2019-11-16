@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
 //Config is struct to access all config
@@ -15,9 +15,9 @@ type Config struct {
 func LoadConfig() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		logrus.Fatal("Error loading .env file")
 	} else {
-		log.Println("Env has been loaded successfully..")
+		logrus.Println("Env has been loaded successfully..")
 	}
 
 }

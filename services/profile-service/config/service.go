@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/common/config"
 	"github.com/sjuliper7/silhouette/common/protocs"
 	grpc2 "github.com/sjuliper7/silhouette/services/profile-service/delivery/grpc"
@@ -25,8 +26,8 @@ func (cf *Config) initService() {
 	//next running the to http
 	net, err := net.Listen("tcp", config.SERVICE_PROFILE_PORT)
 	if err != nil {
-		log.Fatalf("could not listen to %s: %v", config.SERVICE_PROFILE_PORT, err)
+		logrus.Fatalln("could not listen to %s: %v", config.SERVICE_PROFILE_PORT, err)
 	}
 
-	log.Fatalln(svr.Serve(net))
+	logrus.Fatalln(svr.Serve(net))
 }

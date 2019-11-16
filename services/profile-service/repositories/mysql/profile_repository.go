@@ -2,9 +2,9 @@ package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
 	"github.com/sjuliper7/silhouette/services/profile-service/repositories"
-	"log"
 )
 
 type mysqlRepository struct {
@@ -21,12 +21,12 @@ func (repo mysqlRepository) GetProfile(userID int64) (profile models.Profile, er
 	stmt, err := repo.Conn.Preparex(sql)
 
 	if err != nil {
-		log.Println("Error when prepare the query %+v", err)
+		logrus.Println("Error when prepare the query %+v", err)
 	}
 
 	err = stmt.Get(&profile, userID)
 	if err != nil {
-		log.Println("Error when getting the value %+v", err)
+		logrus.Println("Error when getting the value %+v", err)
 	}
 
 	return profile, nil

@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/jmoiron/sqlx"
-	"log"
+	"github.com/sirupsen/logrus"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,9 +13,9 @@ func (cf *Config) initDatabase() {
 	db, err := sqlx.Connect("mysql", populateStringConnection())
 
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	} else {
-		log.Println("Database connected successfully..")
+		logrus.Println("Database connected successfully..")
 	}
 
 	cf.DB = db

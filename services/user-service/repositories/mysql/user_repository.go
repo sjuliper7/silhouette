@@ -2,11 +2,9 @@ package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories"
-
-	"log"
-
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
+	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 )
 
 type mysqlRepository struct {
@@ -22,7 +20,7 @@ func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
 	sql := `SELECT id, username, email, name, role FROM users where is_active = true`
 	rows, err := repo.Conn.Queryx(sql)
 	if err != nil {
-		log.Fatalln(err.Error)
+		logrus.Fatalln(err.Error)
 	}
 
 	for rows.Next() {
@@ -30,7 +28,7 @@ func (repo mysqlRepository) GetAlluser() (users []models.User, err error) {
 		var err = rows.StructScan(&user)
 
 		if err != nil {
-			log.Println("Failed when getting result with params %+v ", err)
+			logrus.Println("Failed when getting result with params %+v ", err)
 			return nil, err
 		}
 
@@ -48,7 +46,7 @@ func (repo mysqlRepository) AddUser(user *models.User) (err error) {
 	var temp int64
 	temp, err = result.LastInsertId()
 	if err != nil {
-		log.Println("Error when inserting values %+v", err)
+		logrus.Println("Error when inserting values %+v", err)
 		return err
 	}
 
@@ -63,12 +61,12 @@ func (repo mysqlRepository) GetUser(userID int64) (user models.User, err error) 
 	stmt, err := repo.Conn.Preparex(sql)
 
 	if err != nil {
-		log.Println("Error when prepare the query %+v", err)
+		logrus.Println("Error when prepare the query %+v", err)
 	}
 
 	err = stmt.Get(&user, userID)
 	if err != nil {
-		log.Println("Error when getting the value %+v", err)
+		logrus.Println("Error when getting the value %+v", err)
 	}
 
 	return user, nil
@@ -79,13 +77,13 @@ func (repo mysqlRepository) UpdateUser(user *models.User) (err error) {
 
 	stmt, err := repo.Conn.Preparex(sql)
 	if err != nil {
-		log.Println("Error when prepare the query %+v", err)
+		logrus.Println("Error when prepare the query %+v", err)
 		return err
 	}
 	_, err = stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.ID)
 
 	if err != nil {
-		log.Println("Error when exec the query with value %+v", err)
+		logrus.Println("Error when exec the query with value %+v", err)
 		return err
 	}
 
@@ -98,13 +96,13 @@ func (repo mysqlRepository) DeleteUser(userID int64) (deleted bool, err error) {
 
 	stmt, err := repo.Conn.Preparex(sql)
 	if err != nil {
-		log.Println("Error when prepare the query %+v", err)
+		logrus.Println("Error when prepare the query %+v", err)
 		return false, err
 	}
 	_, err = stmt.Exec(userID)
 
 	if err != nil {
-		log.Println("Error when exec the query with value %+v", err)
+		logrus.Println("Error when exec the query with value %+v", err)
 		return false, err
 	}
 

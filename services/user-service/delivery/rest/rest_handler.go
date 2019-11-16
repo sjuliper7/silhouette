@@ -2,6 +2,7 @@ package rest
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"log"
 	"net/http"
@@ -56,7 +57,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request){
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		log.Println("Error when casting getting user")
+		logrus.Println("Error when casting getting user")
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 

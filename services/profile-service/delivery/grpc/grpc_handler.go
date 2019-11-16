@@ -2,8 +2,8 @@ package grpc
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/common/protocs"
-	"log"
 )
 
 func (ps ProfileServer) GetProfile(ctx context.Context, params *protocs.UserGetProfileArguments) (*protocs.Profile, error) {
@@ -11,7 +11,7 @@ func (ps ProfileServer) GetProfile(ctx context.Context, params *protocs.UserGetP
 	pf, err := ps.profileUc.GetProfile(UserID)
 
 	if err != nil {
-		log.Println("Failed when call [usecase][GetProfile]")
+		logrus.Println("Failed when call [usecase][GetProfile]")
 		return nil, err
 	}
 
