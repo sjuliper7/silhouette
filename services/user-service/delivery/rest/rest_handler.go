@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,7 @@ func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (usr UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
-	var user = models.User{
+	var user = models.UserTable{
 		Username: r.FormValue("username"),
 		Email:    r.FormValue("email"),
 		Name:     r.FormValue("name"),
@@ -52,7 +53,7 @@ func (usr UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request){
+func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -61,13 +62,14 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request){
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	user := models.User{}
+	user := models.UserTable{}
 
 	user.ID = uint64(id)
 	user.Username = r.FormValue("username")
 	user.Email = r.FormValue("email")
 	user.Name = r.FormValue("name")
 	user.Role = r.FormValue("role")
+	user.UpdatedAt = time.Now()
 
 	err = usr.usecase.UpdateUser(&user)
 
@@ -78,7 +80,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request){
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request){
+func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
