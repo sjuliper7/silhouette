@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -28,6 +29,7 @@ func populateStringConnection() string {
 	stringConnection += os.Getenv("DATABASE_USER") + ":" + os.Getenv("DATABASE_PASSWORD") +
 		"@tcp(" + os.Getenv("DATABASE_HOST") + ":" + os.Getenv("DATABASE_PORT") + ")/" +
 		os.Getenv("DATABASE_NAME")
+	stringConnection += fmt.Sprintf("?%s", "parseTime=true")
 
 	return stringConnection
 }
