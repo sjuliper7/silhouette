@@ -25,7 +25,7 @@ func (uc userUsecase) GetAlluser() (users []models.User, err error) {
 
 	return users, err
 }
-func (uc userUsecase) AddUser(user *models.User) (err error) {
+func (uc userUsecase) AddUser(user *models.UserTable) (err error) {
 
 	err = uc.userRepo.AddUser(user)
 	if err != nil {
@@ -36,18 +36,27 @@ func (uc userUsecase) AddUser(user *models.User) (err error) {
 }
 
 func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
-	user, err = uc.userRepo.GetUser(userID)
+	ut := models.UserTable{}
+	ut, err = uc.userRepo.GetUser(userID)
 
 	if err != nil {
 		log.Println("[usecase][GetUser] Error when calling repository to get user")
 		return user, err
 	}
+
+	user.Role = ut.Role
+	user.Username = ut.Username
+	user.Email = ut.Email
+	user.Name = ut.Name
+	user.ID = ut.ID
+	user.CreatedAt = ut.CreatedAt
+	user.UpdatedAt = ut.UpdatedAt
+
 	var profile models.Profile = models.Profile{}
 	profile, err = uc.profileRepo.GetProfile(userID)
 
 	if err != nil {
 		log.Println("[usecase][GetUser] Error when calling profile repository to get profile")
-		return user, err
 	}
 
 	user.Profile = profile
@@ -55,7 +64,7 @@ func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
 	return user, nil
 }
 
-func (uc userUsecase) UpdateUser(user *models.User) (err error) {
+func (uc userUsecase) UpdateUser(user *models.UserTable) (err error) {
 
 	err = uc.userRepo.UpdateUser(user)
 	if err != nil {
