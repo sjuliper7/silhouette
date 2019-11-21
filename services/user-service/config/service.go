@@ -22,7 +22,7 @@ func (cf *Config) initService() {
 }
 
 func initRpcService(cg *Config) {
-	userRepo := mysql.NewMysqlRepository(cg.DB)
+	userRepo := mysql.NewUserMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
 	if err != nil {
 		log.Println("Error when to connect grpc to profile service")
@@ -46,7 +46,7 @@ func initRpcService(cg *Config) {
 }
 
 func initRestService(cg *Config) {
-	userRepo := mysql.NewMysqlRepository(cg.DB)
+	userRepo := mysql.NewUserMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
 	if err != nil {
 		logrus.Println("Error when to connect grpc to profile service")
