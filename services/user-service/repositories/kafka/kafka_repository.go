@@ -3,6 +3,7 @@ package kafka
 import (
 	"encoding/json"
 	"github.com/sirupsen/logrus"
+	"github.com/sjuliper7/silhouette/common/constans"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -14,7 +15,7 @@ type kafkaProducerRepository struct {
 func (kRepo kafkaProducerRepository) RegisterDonePublishMessage(profile models.Profile) (err error) {
 	defer kRepo.kafkaRepo.Close()
 
-	topic := "kafka.registration"
+	topic := string(constans.TopicUserRegistration)
 
 	message, err := json.Marshal(profile)
 	if err != nil {

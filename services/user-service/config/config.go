@@ -29,5 +29,6 @@ func InitConfig() {
 
 	var cf Config
 	cf.initDatabase()
+	cf.initKafka()
 	cf.initService()
 }

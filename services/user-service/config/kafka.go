@@ -13,7 +13,9 @@ func (cfg *Config) initKafka() (err error) {
 	})
 
 	if err != nil {
-		logrus.Println("[config][initKafka] while create producer", err)
+		logrus.Println("[config][initKafka] Error while create producer", err)
+	}else{
+		logrus.Println("[config][initKafka] Success while create producer")
 	}
 
 	return nil
