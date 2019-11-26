@@ -6,7 +6,7 @@ import (
 
 //Repository declaration type interface
 type UserRepository interface {
-	GetAlluser() (users []models.User, err error)
+	GetAlluser() (users []models.UserTable, err error)
 	AddUser(user *models.UserTable) (err error)
 	GetUser(userID int64) (user models.UserTable, err error)
 	UpdateUser(user *models.UserTable) (err error)
