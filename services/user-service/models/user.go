@@ -4,11 +4,11 @@ import "time"
 
 //User struct is return value as response
 type User struct {
-	ID        uint64    `json:"id" db:"id"`
-	Username  string    `json:"username" db:"username"`
-	Email     string    `json:"email" db:"email"`
-	Name      string    `json:"name" db:"name"`
-	Role      string    `json:"role" db:"role"`
+	ID        uint64    `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Name      string    `json:"name"`
+	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Profile   Profile   `json:"profile"`
@@ -21,6 +21,7 @@ type UserTable struct {
 	Email     string    `db:"email"`
 	Name      string    `db:"name"`
 	Role      string    `db:"role"`
+	IsActive  int       `db:"is_active"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
