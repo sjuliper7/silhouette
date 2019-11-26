@@ -16,8 +16,8 @@ func NewUserMysqlRepository(conn *sqlx.DB) repositories.UserRepository {
 	return &userMysqlRepository{conn}
 }
 
-func (repo userMysqlRepository) GetAlluser() (users []models.User, err error) {
-	sql := `SELECT id, username, email, name, role, created_at, updated_at FROM users where is_active = true`
+func (repo userMysqlRepository) GetAlluser() (users []models.UserTable, err error) {
+	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true`
 	rows, err := repo.Conn.Queryx(sql)
 	if err != nil {
 		logrus.Fatalln("Error ", err.Error())
@@ -33,16 +33,7 @@ func (repo userMysqlRepository) GetAlluser() (users []models.User, err error) {
 			return nil, err
 		}
 
-		user := models.User{}
-		user.Username = temp.Username
-		user.Role = temp.Role
-		user.Name = temp.Name
-		user.Email = temp.Username
-		user.ID = temp.ID
-		user.CreatedAt = temp.CreatedAt
-		user.UpdatedAt = temp.UpdatedAt
-
-		users = append(users, user)
+		users = append(users, temp)
 
 	}
 
@@ -78,7 +69,7 @@ func (repo userMysqlRepository) AddUser(user *models.UserTable) (err error) {
 
 func (repo userMysqlRepository) GetUser(userID int64) (user models.UserTable, err error) {
 
-	sql := `SELECT id, username, email, name, role, created_at, updated_at FROM users where is_active = true and id = ?`
+	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true and id = ?`
 	stmt, err := repo.Conn.Preparex(sql)
 
 	if err != nil {
