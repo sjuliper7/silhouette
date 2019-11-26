@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
+	"time"
 )
 
 type fields struct {
@@ -15,6 +16,71 @@ type fields struct {
 }
 
 func TestMysqlRepository_GetAlluser(t *testing.T) {
+
+	tMock := time.Now()
+
+	mockDb, mock, err := sqlmock.New()
+
+	if err != nil {
+		t.Error("Failed mock db")
+	}
+
+	sx := sqlx.NewDb(mockDb, "mockdb")
+
+	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true`
+	rgxQuery := regexp.QuoteMeta(sql)
+
+	test := []struct {
+		Name   string
+		Fields fields
+		Want   []models.UserTable
+	}{
+		{
+			Name:   "Test-1",
+			Fields: fields{DB: sx},
+			Want: []models.UserTable{
+				models.UserTable{
+					ID:        1,
+					Username:  "sjuliper7",
+					Email:     "sjuliper7@gmail.com",
+					Name:      "Juliper Simanjuntak",
+					Role:      "user",
+					IsActive:  1,
+					CreatedAt: tMock,
+					UpdatedAt: tMock,
+				},
+				models.UserTable{
+					ID:        2,
+					Username:  "yesica",
+					Email:     "yesica@gmail.com",
+					Name:      "Yesica Tampubolon",
+					Role:      "user",
+					IsActive:  1,
+					CreatedAt: tMock,
+					UpdatedAt: tMock,
+				},
+			},
+		},
+	}
+
+	for _, tt := range test {
+		repo := userMysqlRepository{Conn: tt.Fields.DB}
+
+		rows := sqlmock.NewRows([]string{"id", "username", "email", "name", "role", "is_active", "created_at", "updated_at"}).
+			AddRow(1, "sjuliper7", "sjuliper7@gmail.com", "Juliper Simanjuntak", "user", 1, tMock, tMock).
+			AddRow(2, "yesica", "yesica@gmail.com", "Yesica Tampubolon", "user", 1, tMock, tMock)
+
+		mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
+
+		resultMock, err := repo.GetAlluser()
+		if err != nil {
+			t.Errorf("Error When call GetAllUser")
+		}
+
+		if !reflect.DeepEqual(resultMock, tt.Want) {
+			t.Errorf("workRepo.GetAllWork() = %v, want %v", resultMock, tt.Want)
+		}
+	}
 
 }
 
@@ -28,7 +94,6 @@ func TestMysqlRepository_AddUser(t *testing.T) {
 	sx := sqlx.NewDb(mockDB, "mockdb")
 
 	sql := `INSERT INTO users(username, email, name, role) VALUES (?, ?, ?, ?)`
-
 	rgxQuery := regexp.QuoteMeta(sql)
 
 	t.Run("Test-1", func(t *testing.T) {
@@ -44,7 +109,7 @@ func TestMysqlRepository_AddUser(t *testing.T) {
 		mock.ExpectExec(rgxQuery).WithArgs(user.Username, user.Email, user.Name, user.Role).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		r := &mysqlRepository{Conn: sx}
+		r := &userMysqlRepository{Conn: sx}
 
 		err := r.AddUser(&user)
 		assert.NoError(t, err)
@@ -53,6 +118,7 @@ func TestMysqlRepository_AddUser(t *testing.T) {
 }
 
 func TestMysqlRepository_GetUser(t *testing.T) {
+	tMock := time.Now()
 	mockDb, mock, err := sqlmock.New()
 	sx := sqlx.NewDb(mockDb, "mockbd")
 
@@ -61,7 +127,7 @@ func TestMysqlRepository_GetUser(t *testing.T) {
 		return
 	}
 
-	rgxQuery := "SELECT id, username, email, name, role FROM users where is_active = true and id = (.+)"
+	rgxQuery := "SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true and id = (.+)"
 
 	tests := []struct {
 		name   string
@@ -72,23 +138,26 @@ func TestMysqlRepository_GetUser(t *testing.T) {
 			name:   "test-1",
 			fields: fields{DB: sx},
 			want: models.UserTable{
-				ID:       1,
-				Username: "sjuliper",
-				Email:    "simanjuntak.juliper@outlook.com",
-				Name:     "Juliper Simanjuntak",
-				Role:     "admin",
+				ID:        1,
+				Username:  "sjuliper",
+				Email:     "simanjuntak.juliper@outlook.com",
+				Name:      "Juliper Simanjuntak",
+				Role:      "admin",
+				IsActive:  1,
+				CreatedAt: tMock,
+				UpdatedAt: tMock,
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &mysqlRepository{
+			r := &userMysqlRepository{
 				Conn: tt.fields.DB,
 			}
 
-			rows := sqlmock.NewRows([]string{"id", "username", "email", "name", "role"}).
-				AddRow(1, "sjuliper", "simanjuntak.juliper@outlook.com", "Juliper Simanjuntak", "admin")
+			rows := sqlmock.NewRows([]string{"id", "username", "email", "name", "role", "is_active", "created_at", "updated_at"}).
+				AddRow(1, "sjuliper", "simanjuntak.juliper@outlook.com", "Juliper Simanjuntak", "admin", 1, tMock, tMock)
 
 			mock.ExpectPrepare(rgxQuery)
 			mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
