@@ -16,11 +16,24 @@ func NewUserUsecase(userRepo repositories.UserRepository, profileRepo repositori
 }
 
 func (uc userUsecase) GetAlluser() (users []models.User, err error) {
-	users, err = uc.userRepo.GetAlluser()
+	usersTable, err := uc.userRepo.GetAlluser()
 
 	if err != nil {
 		log.Println("Failed when call [repositories][GetAlluser] ", err)
 		return nil, err
+	}
+
+	for _, u := range usersTable {
+		user := models.User{}
+		user.ID = u.ID
+		user.Username = u.Username
+		user.Email = u.Email
+		user.Name = u.Name
+		user.Role = u.Role
+		user.CreatedAt = u.CreatedAt
+		user.UpdatedAt = u.UpdatedAt
+
+		users = append(users, user)
 	}
 
 	return users, err
