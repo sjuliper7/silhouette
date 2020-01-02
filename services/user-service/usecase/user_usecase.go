@@ -1,9 +1,9 @@
 package usecase
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
-	"log"
 )
 
 type userUsecase struct {
@@ -15,11 +15,11 @@ func NewUserUsecase(userRepo repositories.UserRepository, profileRepo repositori
 	return userUsecase{userRepo, profileRepo}
 }
 
-func (uc userUsecase) GetAlluser() (users []models.User, err error) {
-	usersTable, err := uc.userRepo.GetAlluser()
+func (uc userUsecase) GetAllUser() (users []models.User, err error) {
+	usersTable, err := uc.userRepo.GetAllUser()
 
 	if err != nil {
-		log.Println("Failed when call [repositories][GetAlluser] ", err)
+		logrus.Println("Failed when call [repositories][GetAlluser] ", err)
 		return nil, err
 	}
 
@@ -36,13 +36,20 @@ func (uc userUsecase) GetAlluser() (users []models.User, err error) {
 		users = append(users, user)
 	}
 
+	users, err = uc.fillProfileDetails(users)
+	if err != nil {
+		logrus.Println("Failed when call [usecase][fillProfileDetails] ", err)
+		return nil, err
+	}
+
 	return users, err
 }
+
 func (uc userUsecase) AddUser(user *models.UserTable) (err error) {
 
 	err = uc.userRepo.AddUser(user)
 	if err != nil {
-		log.Println("[usecase][AddUser] Error when calling repository to save")
+		logrus.Println("[usecase][AddUser] Error when calling repository to save")
 	}
 
 	return nil
@@ -53,7 +60,7 @@ func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
 	ut, err = uc.userRepo.GetUser(userID)
 
 	if err != nil {
-		log.Println("[usecase][GetUser] Error when calling repository to get user")
+		logrus.Println("[usecase][GetUser] Error when calling repository to get user")
 		return user, err
 	}
 
@@ -69,7 +76,7 @@ func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
 	profile, err = uc.profileRepo.GetProfile(userID)
 
 	if err != nil {
-		log.Println("[usecase][GetUser] Error when calling profile repository to get profile")
+		logrus.Println("[usecase][GetUser] Error when calling profile repository to get profile")
 	}
 
 	user.Profile = profile
@@ -77,24 +84,48 @@ func (uc userUsecase) GetUser(userID int64) (user models.User, err error) {
 	return user, nil
 }
 
-func (uc userUsecase) UpdateUser(user *models.UserTable) (err error) {
+func (uc userUsecase) UpdateUser(us models.UserTable) (user models.UserTable, err error) {
 
-	err = uc.userRepo.UpdateUser(user)
+	user, err = uc.userRepo.GetUser(int64(us.ID))
+
+	user.Role = us.Role
+	user.Email = us.Email
+	user.Username = us.Username
+	user.Name = us.Name
+	user.UpdatedAt = us.UpdatedAt
+
+
+	err = uc.userRepo.UpdateUser(&user)
+
 	if err != nil {
-		log.Println("[usecase][UpdateUser] Error when calling repository to update user")
-		return err
+		logrus.Println("[usecase][UpdateUser] Error when calling repository to update user")
+		return user,err
 	}
 
-	return nil
+	return user,nil
 }
 
 func (uc userUsecase) DeleteUser(userID int64) (deleted bool, err error) {
 	deleted, err = uc.userRepo.DeleteUser(userID)
 
 	if err != nil {
-		log.Println("[usecase][Delete] Error when calling repository to delete user")
+		logrus.Println("[usecase][Delete] Error when calling repository to delete user")
 		return false, err
 	}
 
 	return deleted, nil
+}
+
+func (uc *userUsecase) fillProfileDetails(users []models.User) ([]models.User, error) {
+	for i, _ := range users{
+		profile, err := uc.profileRepo.GetProfile(int64(users[i].ID))
+
+		if err != nil {
+			logrus.Println("[usecase][GetAllUser] Error when calling profile repository to get profile")
+			return users, err
+		}
+
+		users[i].Profile = profile
+	}
+	return users, nil
 }

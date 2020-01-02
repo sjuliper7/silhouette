@@ -15,18 +15,18 @@ func NewMysqlProfileRepository(conn *sqlx.DB) repositories.Repository {
 	return &mysqlRepository{Conn: conn}
 }
 
-func (repo mysqlRepository) GetProfile(userID int64) (profile models.Profile, err error) {
+func (repo mysqlRepository) GetProfile(userID int64) (profile models.ProfileTable, err error) {
 	sql := `SELECT id, user_id, address, work_at, phone_number, gender FROM profiles WHERE user_id = ?`
 
 	stmt, err := repo.Conn.Preparex(sql)
 
 	if err != nil {
-		logrus.Println("Error when prepare the query %+v", err)
+		logrus.Println("Error when prepare the query ", err)
 	}
 
 	err = stmt.Get(&profile, userID)
 	if err != nil {
-		logrus.Println("Error when getting the value %+v", err)
+		logrus.Println(err)
 	}
 
 	return profile, nil

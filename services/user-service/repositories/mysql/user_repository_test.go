@@ -117,6 +117,50 @@ func TestMysqlRepository_AddUser(t *testing.T) {
 	})
 }
 
+func TestUserMysqlRepository_UpdateUser(t *testing.T) {
+	tMock := time.Now()
+	dbMock, mock, err := sqlmock.New()
+
+	if err != nil {
+		t.Error("Failed mock db")
+	}
+
+	user := models.UserTable{
+		ID:        1,
+		Username:  "sjuliper7",
+		Email:     "sjuliper7@gmail.com",
+		Name:      "Juliper Simanjuntak",
+		Role:      "user",
+		IsActive:  1,
+		CreatedAt: tMock,
+		UpdatedAt: tMock,
+	}
+
+	sx := sqlx.NewDb(dbMock, "mockdb")
+
+	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
+	rgxQuery := regexp.QuoteMeta(sql)
+
+	t.Run("Test-1", func(t *testing.T) {
+		repo := &userMysqlRepository{Conn: sx}
+
+		mock.ExpectPrepare(rgxQuery)
+		mock.ExpectExec(rgxQuery).WithArgs(user.Username,
+			user.Email,
+			user.Name,
+			user.Role,
+			user.IsActive,
+			user.CreatedAt,
+			user.UpdatedAt,
+			user.ID).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err := repo.UpdateUser(&user)
+		assert.NoError(t, err)
+	})
+
+}
+
 func TestMysqlRepository_GetUser(t *testing.T) {
 	tMock := time.Now()
 	mockDb, mock, err := sqlmock.New()
@@ -169,4 +213,28 @@ func TestMysqlRepository_GetUser(t *testing.T) {
 		})
 	}
 
+}
+
+func TestUserMysqlRepository_DeleteUser(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+
+	sx := sqlx.NewDb(dbMock, "mockdb")
+
+	if err != nil {
+		t.Error("Failed mock db")
+	}
+
+	sql := `UPDATE users SET is_active = false where id =?`
+	rgxQuery := regexp.QuoteMeta(sql)
+
+	t.Run("Test-delete-1", func(t *testing.T) {
+		repo := userMysqlRepository{Conn:sx}
+
+		prep := mock.ExpectPrepare(rgxQuery)
+		prep.ExpectExec().WithArgs(1).WillReturnResult(sqlmock.NewResult(1,1))
+
+		_, err := repo.DeleteUser(1)
+
+		assert.NoError(t, err)
+	})
 }

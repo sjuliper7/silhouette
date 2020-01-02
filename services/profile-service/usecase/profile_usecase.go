@@ -14,7 +14,7 @@ func NewProfileUsecase(repo repositories.Repository) ProfileUsecase {
 	return profileUsecase{repo: repo}
 }
 
-func (uc profileUsecase) GetProfile(userID int64) (profile models.Profile, err error) {
+func (uc profileUsecase) GetProfile(userID int64) (profile models.ProfileTable, err error) {
 	profile, err = uc.repo.GetProfile(userID)
 
 	if err != nil {

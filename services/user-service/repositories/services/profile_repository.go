@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/common/config"
-	"github.com/sjuliper7/silhouette/common/protocs"
+	"github.com/sjuliper7/silhouette/commons/config"
+	models2 "github.com/sjuliper7/silhouette/commons/models"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"google.golang.org/grpc"
 )
 
 type profileRepository struct {
-	clientProfile protocs.ProfilesClient
+	clientProfile models2.ProfilesClient
 }
 
 func NewProfileRepository() (repositories.ProfileRepository, error) {
@@ -25,15 +25,15 @@ func NewProfileRepository() (repositories.ProfileRepository, error) {
 		return nil, err
 	}
 
-	repo.clientProfile = protocs.NewProfilesClient(conn)
+	repo.clientProfile = models2.NewProfilesClient(conn)
 
 	return repo, nil
 }
 
-func (repo profileRepository) GetProfile(UserID int64) (profile models.Profile, err error) {
+func (repo profileRepository) GetProfile(userID int64) (profile models.Profile, err error) {
 	profile = models.Profile{}
-	result, err := repo.clientProfile.GetProfile(context.Background(), &protocs.UserGetProfileArguments{
-		UserID: 1,
+	result, err := repo.clientProfile.GetProfile(context.Background(), &models2.UserGetProfileArguments{
+		UserID: userID,
 	})
 
 	if err != nil {

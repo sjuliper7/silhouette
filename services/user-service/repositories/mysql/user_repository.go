@@ -16,7 +16,7 @@ func NewUserMysqlRepository(conn *sqlx.DB) repositories.UserRepository {
 	return &userMysqlRepository{conn}
 }
 
-func (repo userMysqlRepository) GetAlluser() (users []models.UserTable, err error) {
+func (repo *userMysqlRepository) GetAllUser() (users []models.UserTable, err error) {
 	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true`
 	rows, err := repo.Conn.Queryx(sql)
 	if err != nil {
@@ -28,7 +28,6 @@ func (repo userMysqlRepository) GetAlluser() (users []models.UserTable, err erro
 		var err = rows.StructScan(&temp)
 
 		if err != nil {
-			logrus.Println("Here")
 			logrus.Println("Failed when getting result with params ", err)
 			return nil, err
 		}
@@ -40,7 +39,7 @@ func (repo userMysqlRepository) GetAlluser() (users []models.UserTable, err erro
 	return users, nil
 }
 
-func (repo userMysqlRepository) AddUser(user *models.UserTable) (err error) {
+func (repo *userMysqlRepository) AddUser(user *models.UserTable) (err error) {
 	sql := `INSERT INTO users(username, email, name, role) VALUES (?, ?, ?, ?)`
 	stmt, err := repo.Conn.Preparex(sql)
 
@@ -67,7 +66,7 @@ func (repo userMysqlRepository) AddUser(user *models.UserTable) (err error) {
 	return nil
 }
 
-func (repo userMysqlRepository) GetUser(userID int64) (user models.UserTable, err error) {
+func (repo *userMysqlRepository) GetUser(userID int64) (user models.UserTable, err error) {
 
 	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true and id = ?`
 	stmt, err := repo.Conn.Preparex(sql)
@@ -84,26 +83,33 @@ func (repo userMysqlRepository) GetUser(userID int64) (user models.UserTable, er
 	return user, nil
 }
 
-func (repo userMysqlRepository) UpdateUser(user *models.UserTable) (err error) {
-	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ?, created_at = ?, updated_at = ? WHERE id=?`
+func (repo *userMysqlRepository) UpdateUser(user *models.UserTable) (err error) {
+	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
 
 	stmt, err := repo.Conn.Preparex(sql)
 	if err != nil {
-		logrus.Println("Error when prepare the query ", err)
+		logrus.Println("[repository][UpdateUser] Error when prepare the query ", err)
 		return err
 	}
-	_, err = stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.ID)
+
+	_, err = stmt.Exec(user.Username,
+		user.Email,
+		user.Name,
+		user.Role,
+		user.IsActive,
+		user.CreatedAt,
+		user.UpdatedAt,
+		user.ID)
 
 	if err != nil {
-		logrus.Println("Error when exec the query with value ", err)
+		logrus.Println("[repository][UpdateUser] Error when exec the query with value ", err)
 		return err
 	}
 
 	return nil
-
 }
 
-func (repo userMysqlRepository) DeleteUser(userID int64) (deleted bool, err error) {
+func (repo *userMysqlRepository) DeleteUser(userID int64) (deleted bool, err error) {
 	sql := `UPDATE users SET is_active = false where id =?`
 
 	stmt, err := repo.Conn.Preparex(sql)

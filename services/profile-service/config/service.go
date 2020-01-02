@@ -2,12 +2,11 @@ package config
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/common/config"
-	"github.com/sjuliper7/silhouette/common/protocs"
+	"github.com/sjuliper7/silhouette/commons/config"
+	"github.com/sjuliper7/silhouette/commons/models"
 	grpc2 "github.com/sjuliper7/silhouette/services/profile-service/delivery/grpc"
 	"github.com/sjuliper7/silhouette/services/profile-service/repositories/mysql"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"
@@ -20,8 +19,8 @@ func (cf *Config) initService() {
 	svr := grpc.NewServer()
 	profileServer := grpc2.NewProfileServer(profileUc)
 	//
-	protocs.RegisterProfilesServer(svr, profileServer)
-	log.Println("Starting RPC server at", config.SERVICE_PROFILE_PORT)
+	models.RegisterProfilesServer(svr, profileServer)
+	logrus.Println("Starting RPC server at", config.SERVICE_PROFILE_PORT)
 
 	//next running the to http
 	net, err := net.Listen("tcp", config.SERVICE_PROFILE_PORT)

@@ -4,14 +4,14 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/common/protocs"
+	"github.com/sjuliper7/silhouette/commons/models"
 )
 
-func (us UserServer) List(context.Context, *empty.Empty) (*protocs.UserList, error) {
-	var userList protocs.UserList
-	var users []*protocs.User
+func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, error) {
+	var userList models.UserList
+	var users []*models.User
 
-	uu, err := us.usecase.GetAlluser()
+	uu, err := us.usecase.GetAllUser()
 
 	if err != nil {
 		logrus.Println("Failed when call [usecase][GetAlluser]")
@@ -19,7 +19,7 @@ func (us UserServer) List(context.Context, *empty.Empty) (*protocs.UserList, err
 	}
 
 	for _, u := range uu {
-		var user protocs.User
+		var user models.User
 		user.ID = u.ID
 		user.Email = u.Email
 		user.Username = u.Username

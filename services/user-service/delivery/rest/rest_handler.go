@@ -11,7 +11,7 @@ import (
 )
 
 func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
-	users, err := usr.usecase.GetAlluser()
+	users, err := usr.usecase.GetAllUser()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
@@ -71,7 +71,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	user.Role = r.FormValue("role")
 	user.UpdatedAt = time.Now()
 
-	err = usr.usecase.UpdateUser(&user)
+	user, err = usr.usecase.UpdateUser(user)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
