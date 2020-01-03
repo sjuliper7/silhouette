@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories/mocks"
 	"github.com/stretchr/testify/assert"
@@ -27,9 +28,12 @@ func TestUserUsecase_GetAllUser(t *testing.T) {
 	mockListUser = append(mockListUser, mockUser)
 
 	t.Run("success", func(t *testing.T) {
-		mockUserRepo.On("GetAllUser").Return(mockListUser, nil).Once()
+		mockUserRepo.On("GetAllUser").Return(
+			mockListUser,
+			nil).
+			Once()
 
-		mockProfile := &models.Profile{
+		mockProfile := models.Profile{
 			ID:          1,
 			Address:     "mock-address",
 			WorkAt:      "mock-work-at",
@@ -47,6 +51,25 @@ func TestUserUsecase_GetAllUser(t *testing.T) {
 		assert.Len(t, listOfUser, len(mockListUser))
 
 		mockUserRepo.AssertExpectations(t)
+		mockProfileRepo.AssertExpectations(t)
+	})
+
+	t.Run("error-failed", func(t *testing.T) {
+		uu := make([]models.UserTable, 0)
+		mockUserRepo.On("GetAllUser").Return(
+			uu,
+			errors.New("Unexpected Error")).
+			Once()
+
+		mockProfileRepo := new(mocks.ProfileServiceMock)
+
+		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo)
+		listOfUser, err := userCase.GetAllUser()
+		assert.NoError(t, err)
+		assert.Len(t, listOfUser, 0)
+
+		mockUserRepo.AssertExpectations(t)
+		mockProfileRepo.AssertExpectations(t)
 	})
 
 }
