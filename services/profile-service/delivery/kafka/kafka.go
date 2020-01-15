@@ -10,7 +10,7 @@ import (
 
 type kafkaSvc struct {
 	kafkaConsumer *kafka.Consumer
-	ProfileUC usecase.ProfileUsecase
+	ProfileUC usecase.ProfileUseCase
 }
 
 func (kafkaService kafkaSvc) topics() []string {
@@ -19,7 +19,7 @@ func (kafkaService kafkaSvc) topics() []string {
 	}
 }
 
-func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUsecase) error {
+func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUseCase) error {
 	kafkaService := kafkaSvc{
 		kafkaConsumer: kafkaConsumer,
 		ProfileUC:     profileUsecase,
@@ -34,27 +34,31 @@ func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.Profil
 				logger.Errf("[delivery][kafka][NewKafkaHandler] portfolio error occured on consumer %s, detail: %v (%v)", "", err, msg)
 				continue
 			}
-			kafkaService.messageHandling(msg)
+			kafkaService.messageHandler(msg)
 		}
 	}()
 
 	return nil
 }
 
-func (kafkaService kafkaSvc) messageHandling(message *kafka.Message)  {
+func (kafkaService kafkaSvc) messageHandler(message *kafka.Message)  {
 	topic := ""
 
 	if message.TopicPartition.Topic != nil{
 		topic = *message.TopicPartition.Topic
 	}
 
-	logrus.Infof("Receive message from kafka topic ", topic)
+	logrus.Infof("Receive message from kafka topic %v", topic)
 
 	var err error
 
 	switch {
-	case topic == "kafka.registration.finish":
-		err = kafkaService.createPortfolio(message)
+	case topic == "user.registration.finish":
+		err = kafkaService.createProfile(message)
+	case topic == "user.updated.finish":
+		err = kafkaService.updateProfile(message)
+	case topic == "user.deleted.finish":
+		err = kafkaService.deleteProfile(message)
 	default:
 
 	}

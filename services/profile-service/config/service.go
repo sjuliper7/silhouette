@@ -14,13 +14,13 @@ import (
 
 func (cf *Config) initService() {
 	repo := mysql.NewMysqlProfileRepository(cf.DB)
-	profileUc := usecase.NewProfileUsecase(repo)
+	profileUc := usecase.NewProfileUseCase(repo)
 
 	svr := grpc.NewServer()
 	profileServer := grpc2.NewProfileServer(profileUc)
 	//
 	models.RegisterProfilesServer(svr, profileServer)
-	logrus.Println("Starting RPC server at", config.SERVICE_PROFILE_PORT)
+	logrus.Infof("starting RPC server at %v", config.SERVICE_PROFILE_PORT)
 
 	//next running the to http
 	net, err := net.Listen("tcp", config.SERVICE_PROFILE_PORT)

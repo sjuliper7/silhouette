@@ -15,7 +15,7 @@ func (cf *Config) initDatabase() {
 	if err != nil {
 		logrus.Fatal(err)
 	} else {
-		logrus.Println("Database connected successfully..")
+		logrus.Println("database connected successfully..")
 	}
 
 	cf.DB = db

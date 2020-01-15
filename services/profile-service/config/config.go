@@ -15,9 +15,9 @@ type Config struct {
 func LoadConfig() {
 	err := godotenv.Load()
 	if err != nil {
-		logrus.Fatal("Error loading .env file")
+		logrus.Fatal("error loading .env file")
 	} else {
-		logrus.Println("Env has been loaded successfully..")
+		logrus.Info("env has been loaded successfully..")
 	}
 
 }

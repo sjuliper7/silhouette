@@ -11,7 +11,7 @@ func (ps ProfileServer) GetProfile(ctx context.Context, params *models.UserGetPr
 	pf, err := ps.profileUc.GetProfile(UserID)
 
 	if err != nil {
-		logrus.Println("Failed when call [usecase][GetProfile]")
+		logrus.Errorf("failed when call [usecase][GetProfile] %v", err)
 		return nil, err
 	}
 
