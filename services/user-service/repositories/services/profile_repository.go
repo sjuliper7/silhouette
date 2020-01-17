@@ -30,7 +30,7 @@ func NewProfileRepository() (repositories.ProfileRepository, error) {
 	return repo, nil
 }
 
-func (repo profileRepository) GetProfile(userID int64) (profile models.Profile, err error) {
+func (repo profileRepository) Get(userID int64) (profile models.Profile, err error) {
 	profile = models.Profile{}
 	result, err := repo.clientProfile.GetProfile(context.Background(), &models2.UserGetProfileArguments{
 		UserID: userID,

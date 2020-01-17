@@ -4,7 +4,7 @@ import "time"
 
 //User struct is return value as response
 type User struct {
-	ID        uint64    `json:"id"`
+	ID        int64    `json:"id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Name      string    `json:"name"`
@@ -16,7 +16,7 @@ type User struct {
 
 //User struct is representative form table user
 type UserTable struct {
-	ID        uint64    `db:"id"`
+	ID        int64    `db:"id"`
 	Username  string    `db:"username"`
 	Email     string    `db:"email"`
 	Name      string    `db:"name"`

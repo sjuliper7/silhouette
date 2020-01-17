@@ -11,7 +11,7 @@ func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, erro
 	var userList models.UserList
 	var users []*models.User
 
-	uu, err := us.usecase.GetAllUser()
+	uu, err := us.usecase.GetAll()
 
 	if err != nil {
 		logrus.Println("Failed when call [usecase][GetAlluser]")
@@ -20,7 +20,7 @@ func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, erro
 
 	for _, u := range uu {
 		var user models.User
-		user.ID = u.ID
+		user.ID = uint64(u.ID)
 		user.Email = u.Email
 		user.Username = u.Username
 		user.Name = u.Name

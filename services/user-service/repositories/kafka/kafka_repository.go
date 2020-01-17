@@ -1,39 +1,52 @@
 package kafka
 
 import (
-	"encoding/json"
+	"errors"
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/commons/constans"
-	"github.com/sjuliper7/silhouette/services/user-service/models"
+	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-type kafkaProducerRepository struct {
-	kafkaRepo *kafka.Producer
+type kafkaRepository struct {
+	kafkaProducer *kafka.Producer
 }
 
-func (kRepo kafkaProducerRepository) RegisterDonePublishMessage(profile models.Profile) (err error) {
-	defer kRepo.kafkaRepo.Close()
+func NewKafkaRepository(kafkaProducer *kafka.Producer) repositories.KafkaRepository {
+	return &kafkaRepository{kafkaProducer: kafkaProducer}
+}
 
-	topic := string(constans.TopicUserRegistration)
+func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (err error) {
 
-	message, err := json.Marshal(profile)
-	if err != nil {
-		logrus.Println("Failed when parse object to json")
-		return err
-	}
+	deliverChan := make(chan kafka.Event)
 
-	//go routine to handle for produce message
 	go func() {
-		err := kRepo.kafkaRepo.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-			Value:          []byte(message),
-		}, nil)
+		err := kafkaRepo.kafkaProducer.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{
+				Topic:     &topic,
+				Partition: kafka.PartitionAny,
+			},
+			Value: message,
+		}, deliverChan)
 
 		if err != nil {
-			logrus.Println("Error when Publish message")
+			logrus.Errorf("[kafka-repository][PublishMessage]error while producing, ",err)
+			deliverChan <- nil
 		}
 	}()
+
+	kafkaEvent := <-deliverChan
+
+	if err != nil {
+		return nil
+	}
+
+	msg := kafkaEvent.(*kafka.Message)
+
+	if msg.TopicPartition.Error != nil {
+		err = errors.New("error while publish kafka message")
+		logrus.Error(err)
+		return err
+	}
 
 	return nil
 }

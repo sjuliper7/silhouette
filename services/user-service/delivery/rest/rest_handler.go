@@ -4,14 +4,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
 
 func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
-	users, err := usr.usecase.GetAllUser()
+	users, err := usr.usecase.GetAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
@@ -20,15 +19,25 @@ func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (usr UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
-	var user = models.UserTable{
+	var user = models.User{
 		Username: r.FormValue("username"),
 		Email:    r.FormValue("email"),
 		Name:     r.FormValue("name"),
 		Role:     r.FormValue("role"),
 	}
 
-	err := usr.usecase.AddUser(&user)
+	var profile = models.Profile{
+		Address:     r.FormValue("address"),
+		WorkAt:      r.FormValue("work_at"),
+		PhoneNumber: r.FormValue("phone_number"),
+		Gender:      r.FormValue("gender"),
+	}
+
+	user.Profile = profile
+
+	err := usr.usecase.Add(&user)
 	if err != nil {
+		logrus.Errorf("error ,",err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -40,13 +49,14 @@ func (usr UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		log.Println("Error when casting params to int")
+		logrus.Errorf("error when casting params to int", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	user, err := usr.usecase.GetUser(int64(id))
+	user, err := usr.usecase.Get(int64(id))
 
 	if err != nil {
+		logrus.Errorf("error, ",err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -58,22 +68,33 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		logrus.Println("Error when casting getting user")
+		logrus.Errorf("Error when casting getting user", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	user := models.UserTable{}
+	user := models.User{}
 
-	user.ID = uint64(id)
+	user.ID = int64(id)
 	user.Username = r.FormValue("username")
 	user.Email = r.FormValue("email")
 	user.Name = r.FormValue("name")
 	user.Role = r.FormValue("role")
 	user.UpdatedAt = time.Now()
 
-	user, err = usr.usecase.UpdateUser(user)
+	profile := models.Profile{
+		UserID:      user.ID,
+		Address:     r.FormValue("address"),
+		WorkAt:      r.FormValue("work_at"),
+		PhoneNumber: r.FormValue("phone_number"),
+		Gender:      r.FormValue("gender"),
+	}
+
+	user.Profile = profile
+
+	user, err = usr.usecase.Update(user)
 
 	if err != nil {
+		logrus.Errorf("error, ",err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -85,13 +106,14 @@ func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		log.Println("Error when casting getting user")
+		logrus.Errorf("Error when casting getting user",err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	deleted, err := usr.usecase.DeleteUser(int64(id))
+	deleted, err := usr.usecase.Delete(int64(id))
 
 	if err != nil {
+		logrus.Errorf("error, ",err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 

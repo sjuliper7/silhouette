@@ -6,17 +6,17 @@ import (
 
 //Repository declaration type interface
 type UserRepository interface {
-	GetAllUser() (users []models.UserTable, err error)
-	AddUser(user *models.UserTable) (err error)
-	GetUser(userID int64) (user models.UserTable, err error)
-	UpdateUser(user *models.UserTable) (err error)
-	DeleteUser(userID int64) (deleted bool, err error)
+	GetAll() (users []models.UserTable, err error)
+	Add(user *models.UserTable) (err error)
+	Get(userID int64) (user models.UserTable, err error)
+	Update(user *models.UserTable) (err error)
+	Delete(userID int64) (deleted bool, err error)
 }
 
 type ProfileRepository interface {
-	GetProfile(userID int64) (profile models.Profile, err error)
+	Get(userID int64) (profile models.Profile, err error)
 }
 
 type KafkaRepository interface {
-	SendMessage(profile *models.Profile) (err error)
+	PublishMessage(topic string, message []byte) (err error)
 }
