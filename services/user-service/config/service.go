@@ -26,7 +26,7 @@ func initRpcService(cg *Config) {
 	userRepo := mysql.NewUserMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
 	if err != nil {
-		logger.Errf("Error when to connect grpc to profile service, ", err)
+		logger.Errf("Error when to connect grpc to profile service, %v", err)
 	}
 
 	kafkaRepository := kafkaProducer.NewKafkaRepository(cg.KafkaProducer)
@@ -37,12 +37,12 @@ func initRpcService(cg *Config) {
 	userServer := grpc_.NewUserServer(usecase)
 
 	models.RegisterUsersServer(svr, userServer)
-	logrus.Infof("Starting RPC server at", config.SERVICE_USER_PORT)
+	logrus.Infof("Starting RPC server at %v", config.SERVICE_USER_PORT)
 
 	//next running the to http
 	net, err := net.Listen("tcp", config.SERVICE_USER_PORT)
 	if err != nil {
-		logrus.Infof("could not listen to %s: ", config.SERVICE_USER_PORT, err)
+		logrus.Errorf("could not listen to %s: %v", config.SERVICE_USER_PORT, err)
 	}
 
 	logrus.Fatalln(svr.Serve(net))
@@ -54,7 +54,7 @@ func initRestService(cg *Config) {
 	userRepo := mysql.NewUserMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
 	if err != nil {
-		logrus.Infof("Error when to connect grpc to profile service", err)
+		logrus.Infof("Error when to connect grpc to profile service %v", err)
 	}
 
 	profileUsecase := usecase.NewUserUsecase(userRepo, profileRepo, kafkaRepo)
@@ -64,7 +64,7 @@ func initRestService(cg *Config) {
 	router.HandleFunc("/users", userRest.Resource).Methods("GET", "POST")
 	router.HandleFunc("/users/{id}", userRest.Resource).Methods("GET", "PUT", "DELETE")
 
-	logrus.Infof("Starting Rest API at", config.REST_USER_PORT)
+	logrus.Infof("Starting Rest API at %v", config.REST_USER_PORT)
 
 	http.ListenAndServe(config.REST_USER_PORT, router)
 

@@ -12,6 +12,7 @@ import (
 func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
 	users, err := usr.usecase.GetAll()
 	if err != nil {
+		logrus.Errorf("[delivery][fetchUser] error when call [user-usecase][GetAll], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -37,7 +38,7 @@ func (usr UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
 
 	err := usr.usecase.Add(&user)
 	if err != nil {
-		logrus.Errorf("error ,",err)
+		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -49,14 +50,14 @@ func (usr UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		logrus.Errorf("error when casting params to int", err)
+		logrus.Errorf("error when casting params to int, %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
 	user, err := usr.usecase.Get(int64(id))
 
 	if err != nil {
-		logrus.Errorf("error, ",err)
+		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Get], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -68,7 +69,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		logrus.Errorf("Error when casting getting user", err)
+		logrus.Errorf("Error when casting getting user %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -94,7 +95,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	user, err = usr.usecase.Update(user)
 
 	if err != nil {
-		logrus.Errorf("error, ",err)
+		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Update], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
@@ -106,14 +107,14 @@ func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		logrus.Errorf("Error when casting getting user",err)
+		logrus.Errorf("Error when casting getting user , %v",err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
 	deleted, err := usr.usecase.Delete(int64(id))
 
 	if err != nil {
-		logrus.Errorf("error, ",err)
+		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Delete], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 

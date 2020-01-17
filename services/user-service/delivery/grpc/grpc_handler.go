@@ -14,7 +14,7 @@ func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, erro
 	uu, err := us.usecase.GetAll()
 
 	if err != nil {
-		logrus.Println("Failed when call [usecase][GetAlluser]")
+		logrus.Println("Failed when call [usecase][GetAlluser] %v", err)
 		return nil, err
 	}
 

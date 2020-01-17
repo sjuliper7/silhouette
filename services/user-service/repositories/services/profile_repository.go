@@ -37,13 +37,13 @@ func (repo profileRepository) Get(userID int64) (profile models.Profile, err err
 	})
 
 	if err != nil {
-		logrus.Println("[repository][profile-service][GetProfile] while grpc GetProfile")
+		logrus.Errorf("[repository][profile-service][GetProfile] while grpc GetProfile %v", err)
 		return profile, err
 	}
 
 	temp, err := json.Marshal(result)
 	if err != nil {
-		logrus.Println("[repository][profile-service][GetProfile] error when marshall to json")
+		logrus.Errorf("[repository][profile-service][GetProfile] error when marshall to json %v", err)
 		return profile, err
 	}
 

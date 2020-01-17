@@ -29,7 +29,7 @@ func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (
 		}, deliverChan)
 
 		if err != nil {
-			logrus.Errorf("[kafka-repository][PublishMessage]error while producing, ",err)
+			logrus.Errorf("[kafka-repository][PublishMessage] error while producing, %v",err)
 			deliverChan <- nil
 		}
 	}()
@@ -44,7 +44,7 @@ func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (
 
 	if msg.TopicPartition.Error != nil {
 		err = errors.New("error while publish kafka message")
-		logrus.Error(err)
+		logrus.Errorf("[kafka-repository][PublishMessage] %v, ",err)
 		return err
 	}
 

@@ -22,7 +22,7 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 	usersTable, err := uc.userRepo.GetAll()
 
 	if err != nil {
-		logrus.Errorf("Failed when call [repositories][GetAlluser] ", err)
+		logrus.Errorf("[usecase][GetAll] failed when call [repositories][GetAll] %v", err)
 		return nil, err
 	}
 
@@ -41,7 +41,7 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 
 	users, err = uc.fillProfileDetails(users)
 	if err != nil {
-		logrus.Errorf("Failed when call [usecase][fillProfileDetails] ", err)
+		logrus.Errorf("[usecase][GetAll] failed when call [usecase][fillProfileDetails] %v", err)
 		return nil, err
 	}
 
@@ -62,7 +62,8 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 	
 	err = uc.userRepo.Add(&userTable)
 	if err != nil {
-		logrus.Errorf("[usecase][AddUser] Error when calling repository to save")
+		logrus.Errorf("[usecase][Add] failed when call [repositories][Add] %v", err)
+		return err
 	}
 
 	profile := models.Profile{
@@ -76,14 +77,14 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 	jsonData, err := json.Marshal(profile)
 
 	if err != nil {
-		logrus.Errorf("[usecase][AddUser] error when marshall data ", err)
+		logrus.Errorf("[usecase][Add] failed when marshall %v", err)
 		return err
 	}
 
 	err = uc.kafkaRepo.PublishMessage("registration-finish", jsonData)
 
 	if err != nil {
-		logrus.Errorf("[usecase][AddUser] error when publish message ", err)
+		logrus.Errorf("[usecase][AddUser] error when publish message %v", err)
 		return err
 	}
 
@@ -95,7 +96,7 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	ut, err = uc.userRepo.Get(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][GetUser] Error when calling repository to get user")
+		logrus.Errorf("[usecase][Get] Error when calling [repositories][Get] %v", err)
 		return user, err
 	}
 
@@ -111,7 +112,8 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	profile, err = uc.profileRepo.Get(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][GetUser] Error when calling profile repository to get profile")
+		logrus.Errorf("[usecase][Get] Error when calling [repositories][Get] %v", err)
+		return user, err
 	}
 
 	user.Profile = profile
@@ -123,6 +125,11 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 
 	userTable, err := uc.userRepo.Get(int64(us.ID))
 
+	if err != nil {
+		logrus.Errorf("[usecase][Update] Error when calling [repositories][Get] %v", err)
+		return user, err
+	}
+
 	user.Role = us.Role
 	user.Email = us.Email
 	user.Username = us.Username
@@ -132,7 +139,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	err = uc.userRepo.Update(&userTable)
 
 	if err != nil {
-		logrus.Errorf("[usecase][UpdateUser] Error when calling repository to update user")
+		logrus.Errorf("[usecase][Update] Error when calling [repositories][Update] %v", err)
 		return user, err
 	}
 
@@ -148,14 +155,14 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	jsonData, err := json.Marshal(profile)
 
 	if err != nil {
-		logrus.Errorf("[usecase][AddUser] error when marshall data ", err)
+		logrus.Errorf("[usecase][Update] error when marshall data %v", err)
 		return user, err
 	}
 
 	err = uc.kafkaRepo.PublishMessage("update-finish", jsonData)
 
 	if err != nil {
-		logrus.Errorf("[usecase][AddUser] error when publish message ", err)
+		logrus.Errorf("[usecase][Update] error when publish message %v", err)
 		return user, err
 	}
 
@@ -166,7 +173,7 @@ func (uc userUsecase) Delete(userID int64) (deleted bool, err error) {
 	deleted, err = uc.userRepo.Delete(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][Delete] Error when calling repository to delete user")
+		logrus.Errorf("[usecase][Delete] Error when calling [repositories][delete] %v", err)
 		return false, err
 	}
 
@@ -178,7 +185,7 @@ func (uc *userUsecase) fillProfileDetails(users []models.User) ([]models.User, e
 		profile, err := uc.profileRepo.Get(int64(users[i].ID))
 
 		if err != nil {
-			logrus.Errorf("[usecase][GetAllUser] Error when calling profile repository to get profile")
+			logrus.Errorf("[usecase][fillProfileDetails] Error when calling [repositories-profile][Get]")
 			return users, err
 		}
 
