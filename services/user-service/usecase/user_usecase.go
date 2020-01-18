@@ -56,10 +56,10 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		Name:      user.Name,
 		Role:      user.Role,
 		IsActive:  1,
-		CreatedAt: time.Time{},
-		UpdatedAt: time.Time{},
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
-	
+
 	err = uc.userRepo.Add(&userTable)
 	if err != nil {
 		logrus.Errorf("[usecase][Add] failed when call [repositories][Add] %v", err)
@@ -81,12 +81,21 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		return err
 	}
 
-	err = uc.kafkaRepo.PublishMessage("registration-finish", jsonData)
+	err = uc.kafkaRepo.PublishMessage("user.registration.finish", jsonData)
 
 	if err != nil {
 		logrus.Errorf("[usecase][AddUser] error when publish message %v", err)
 		return err
 	}
+
+	user.ID = userTable.ID
+	user.Name = userTable.Name
+	user.Username = userTable.Username
+	user.Email = userTable.Email
+	user.Role = userTable.Role
+	user.CreatedAt = userTable.CreatedAt
+	user.UpdatedAt = userTable.CreatedAt
+	user.Profile = profile
 
 	return nil
 }

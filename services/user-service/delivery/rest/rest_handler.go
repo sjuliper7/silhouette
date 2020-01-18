@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
-	users, err := usr.usecase.GetAll()
+func (userServerRest UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
+	users, err := userServerRest.usecase.GetAll()
 	if err != nil {
 		logrus.Errorf("[delivery][fetchUser] error when call [user-usecase][GetAll], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -19,7 +19,7 @@ func (usr UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, users)
 }
 
-func (usr UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
 	var user = models.User{
 		Username: r.FormValue("username"),
 		Email:    r.FormValue("email"),
@@ -36,7 +36,7 @@ func (usr UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
 
 	user.Profile = profile
 
-	err := usr.usecase.Add(&user)
+	err := userServerRest.usecase.Add(&user)
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -45,7 +45,7 @@ func (usr UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (usr UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -54,7 +54,7 @@ func (usr UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	user, err := usr.usecase.Get(int64(id))
+	user, err := userServerRest.usecase.Get(int64(id))
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Get], %v", err)
@@ -64,7 +64,7 @@ func (usr UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -92,7 +92,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 
 	user.Profile = profile
 
-	user, err = usr.usecase.Update(user)
+	user, err = userServerRest.usecase.Update(user)
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Update], %v", err)
@@ -102,7 +102,7 @@ func (usr UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -111,7 +111,7 @@ func (usr UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	deleted, err := usr.usecase.Delete(int64(id))
+	deleted, err := userServerRest.usecase.Delete(int64(id))
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Delete], %v", err)

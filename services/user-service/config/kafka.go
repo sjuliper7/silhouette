@@ -8,8 +8,7 @@ import (
 func (cfg *Config) initKafka() (err error) {
 
 	cfg.KafkaProducer, err = kf.NewProducer(&kf.ConfigMap{
-		"bootstrap.servers": "localhost",
-		"group.id":          "silhouette",
+		"bootstrap.servers": "127.0.0.1",
 	})
 
 	if err != nil {

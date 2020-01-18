@@ -40,15 +40,23 @@ func (repo *userMysqlRepository) GetAll() (users []models.UserTable, err error) 
 }
 
 func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
-	sql := `INSERT INTO users(username, email, name, role) VALUES (?, ?, ?, ?,)`
-	stmt, err := repo.Conn.Preparex(sql)
+	tx, err := repo.Conn.Beginx()
+	if err != nil {
+		logrus.Errorf("[user-repository][Add] error while creating transactions %v", err)
+		return  err
+	}
+
+	defer tx.Rollback()
+
+	sql := `INSERT INTO users(username, email, name, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
+	stmt, err := tx.Preparex(sql)
 
 	if err != nil {
 		logrus.Errorf("[user-repository][Add] error when preparing query, %v",err)
 		return err
 	}
 
-	result, err := stmt.Exec(user.Username, user.Email, user.Name, user.Role)
+	result, err := stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		logrus.Errorf("[user-repository][Add] error when inserting values, %v",err)
 		return err
@@ -62,6 +70,14 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 	}
 
 	user.ID = temp
+
+	err = tx.Commit()
+	if err != nil{
+		logrus.Errorf("[user-repository][Add] error while commit transaction, %v", err)
+		return nil
+	}
+
+	logrus.Infof("[user-repository][Add] successfully to add user : %v",user.ID)
 
 	return nil
 }
@@ -84,9 +100,18 @@ func (repo *userMysqlRepository) Get(userID int64) (user models.UserTable, err e
 }
 
 func (repo *userMysqlRepository) Update(user *models.UserTable) (err error) {
+	logrus.Infof("[user-repository][Update] start update user: %v", user.ID)
+	tx, err := repo.Conn.Beginx()
+	if err != nil {
+		logrus.Errorf("[user-repository][Update] error while creating transactions %v", err)
+		return  err
+	}
+
+	defer tx.Rollback()
+
 	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
 
-	stmt, err := repo.Conn.Preparex(sql)
+	stmt, err := tx.Preparex(sql)
 	if err != nil {
 		logrus.Errorf("[user-repository][Update] error when prepare the query , %v",err)
 		return err
@@ -106,13 +131,29 @@ func (repo *userMysqlRepository) Update(user *models.UserTable) (err error) {
 		return err
 	}
 
+	err = tx.Commit()
+	if err != nil {
+		logrus.Errorf("[user-repository][Update] error when commit transactions %v", err)
+		return nil
+	}
+
+	logrus.Infof("[user-repository][Update] successfully update user: %v", user.ID)
+
 	return nil
 }
 
 func (repo *userMysqlRepository) Delete(userID int64) (deleted bool, err error) {
+	tx, err := repo.Conn.Beginx()
+	if err != nil {
+		logrus.Errorf("[user-repository][Delete] error while creating transactions %v", err)
+		return  false,err
+	}
+
+	defer tx.Rollback()
+
 	sql := `UPDATE users SET is_active = false where id =?`
 
-	stmt, err := repo.Conn.Preparex(sql)
+	stmt, err := tx.Preparex(sql)
 	if err != nil {
 		logrus.Errorf("[user-repository][Delete] error when prepare the query , %v",err)
 		return false, err
@@ -124,5 +165,12 @@ func (repo *userMysqlRepository) Delete(userID int64) (deleted bool, err error) 
 		return false, err
 	}
 
+	err = tx.Commit()
+	if err != nil {
+		logrus.Errorf("[user-repository][Delete] error while commit transactions %v", err)
+		return false, err
+	}
+
+	logrus.Infof("successfully to deleted user : %v", userID)
 	return true, nil
 }

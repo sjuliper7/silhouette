@@ -16,7 +16,7 @@ func NewKafkaRepository(kafkaProducer *kafka.Producer) repositories.KafkaReposit
 }
 
 func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (err error) {
-
+	logrus.Infof("publishing message to kafka, topic :%v",topic)
 	deliverChan := make(chan kafka.Event)
 
 	go func() {
@@ -47,6 +47,8 @@ func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (
 		logrus.Errorf("[kafka-repository][PublishMessage] %v, ",err)
 		return err
 	}
+
+	logrus.Infof("success publish message to kafka, topic :%v",topic)
 
 	return nil
 }
