@@ -6,12 +6,14 @@ import (
 	"github.com/sjuliper7/silhouette/commons/models"
 )
 
-func (ps ProfileServer) GetProfile(ctx context.Context, params *models.UserGetProfileArguments) (*models.Profile, error) {
+func (profileServer ProfileServer) GetProfile(ctx context.Context, params *models.UserGetProfileArguments) (*models.Profile, error) {
+	logrus.Infof("request : %v", params)
+
 	UserID := params.UserID
-	pf, err := ps.profileUc.GetProfile(UserID)
+	pf, err := profileServer.profileUsecase.Get(UserID)
 
 	if err != nil {
-		logrus.Errorf("failed when call [usecase][GetProfile] %v", err)
+		logrus.Errorf("[delivery][profile] failed when call [usecase][GetProfile] %v", err)
 		return nil, err
 	}
 

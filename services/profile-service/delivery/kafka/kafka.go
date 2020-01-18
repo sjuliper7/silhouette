@@ -3,26 +3,26 @@ package kafka
 import (
 	"github.com/koinworks/asgard-heimdal/libs/logger"
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/commons/constans"
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 type kafkaSvc struct {
 	kafkaConsumer *kafka.Consumer
-	ProfileUC usecase.ProfileUseCase
+	profileUsecase usecase.ProfileUseCase
 }
+
 
 func (kafkaService kafkaSvc) topics() []string {
 	return []string{
-		string(constans.TopicUserRegistration),
+		"user.registration.finish",
 	}
 }
 
 func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUseCase) error {
 	kafkaService := kafkaSvc{
 		kafkaConsumer: kafkaConsumer,
-		ProfileUC:     profileUsecase,
+		profileUsecase:     profileUsecase,
 	}
 
 	kafkaService.kafkaConsumer.SubscribeTopics(kafkaService.topics(), nil)
@@ -65,6 +65,6 @@ func (kafkaService kafkaSvc) messageHandler(message *kafka.Message)  {
 
 
 	if err != nil {
-		logrus.Print(err)
+		logrus.Error(err)
 	}
 }

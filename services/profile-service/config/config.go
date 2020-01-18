@@ -4,11 +4,13 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 //Config is struct to access all config
 type Config struct {
-	DB *sqlx.DB
+	DB            *sqlx.DB
+	KafkaConsumer *kafka.Consumer
 }
 
 //LoadConfig is function to load config
@@ -27,5 +29,6 @@ func InitConfig() {
 
 	var cf Config
 	cf.initDatabase()
+	cf.initKafka()
 	cf.initService()
 }

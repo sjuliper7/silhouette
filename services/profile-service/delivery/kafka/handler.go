@@ -9,11 +9,12 @@ import (
 )
 
 func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
+	logrus.Infof("request : %v", string(message.Value))
 	profile := models.ProfileTable{}
 	err = json.Unmarshal(message.Value, &profile)
 	helper.CheckError(err)
 
-	err = kafkaService.ProfileUC.AddProfile(profile)
+	err = kafkaService.profileUsecase.Add(profile)
 	if err != nil {
 		logrus.Errorf("[kafka-handler][createProfile] error when creating profile %v", err)
 		return err
@@ -23,11 +24,12 @@ func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
 }
 
 func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
+	logrus.Infof("request : %v", string(message.Value))
 	profile := models.ProfileTable{}
 	err = json.Unmarshal(message.Value, &profile)
 	helper.CheckError(err)
 
-	err = kafkaService.ProfileUC.UpdateProfile(profile)
+	err = kafkaService.profileUsecase.Update(profile)
 
 	if err != nil {
 		logrus.Println("[kafka-handler][updateProfile] error when updating profile", err)
@@ -38,12 +40,12 @@ func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
 }
 
 func (kafkaService kafkaSvc) deleteProfile(message *kafka.Message) ( err error) {
-
+	logrus.Infof("request : %v", string(message.Value))
 	profile := models.ProfileTable{}
 	err = json.Unmarshal(message.Value, &profile)
 	helper.CheckError(err)
 
-	err = kafkaService.ProfileUC.DeleteProfile(int64(profile.ID))
+	err = kafkaService.profileUsecase.Delete(int64(profile.ID))
 
 	if err != nil {
 		logrus.Errorf("[kafka-handler][updateProfile] error when deleting profile %v", err)
