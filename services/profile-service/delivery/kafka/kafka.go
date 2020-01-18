@@ -3,26 +3,28 @@ package kafka
 import (
 	"github.com/koinworks/asgard-heimdal/libs/logger"
 	"github.com/sirupsen/logrus"
+	"github.com/sjuliper7/silhouette/commons/constans"
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 type kafkaSvc struct {
-	kafkaConsumer *kafka.Consumer
+	kafkaConsumer  *kafka.Consumer
 	profileUsecase usecase.ProfileUseCase
 }
 
-
 func (kafkaService kafkaSvc) topics() []string {
 	return []string{
-		"user.registration.finish",
+		string(constans.TopicUserRegistration),
+		string(constans.TopicUserUpdated),
+		string(constans.TopicUserDeleted),
 	}
 }
 
 func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUseCase) error {
 	kafkaService := kafkaSvc{
-		kafkaConsumer: kafkaConsumer,
-		profileUsecase:     profileUsecase,
+		kafkaConsumer:  kafkaConsumer,
+		profileUsecase: profileUsecase,
 	}
 
 	kafkaService.kafkaConsumer.SubscribeTopics(kafkaService.topics(), nil)
@@ -41,10 +43,10 @@ func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.Profil
 	return nil
 }
 
-func (kafkaService kafkaSvc) messageHandler(message *kafka.Message)  {
+func (kafkaService kafkaSvc) messageHandler(message *kafka.Message) {
 	topic := ""
 
-	if message.TopicPartition.Topic != nil{
+	if message.TopicPartition.Topic != nil {
 		topic = *message.TopicPartition.Topic
 	}
 
@@ -53,16 +55,15 @@ func (kafkaService kafkaSvc) messageHandler(message *kafka.Message)  {
 	var err error
 
 	switch {
-	case topic == "user.registration.finish":
+	case topic == string(constans.TopicUserRegistration):
 		err = kafkaService.createProfile(message)
-	case topic == "user.updated.finish":
+	case topic == string(constans.TopicUserUpdated):
 		err = kafkaService.updateProfile(message)
-	case topic == "user.deleted.finish":
+	case topic == string(constans.TopicUserDeleted):
 		err = kafkaService.deleteProfile(message)
 	default:
 
 	}
-
 
 	if err != nil {
 		logrus.Error(err)

@@ -6,6 +6,7 @@ import (
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"time"
+	"github.com/sjuliper7/silhouette/commons/constans"
 )
 
 type userUsecase struct {
@@ -81,7 +82,7 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		return err
 	}
 
-	err = uc.kafkaRepo.PublishMessage("user.registration.finish", jsonData)
+	err = uc.kafkaRepo.PublishMessage(string(constans.TopicUserRegistration), jsonData)
 
 	if err != nil {
 		logrus.Errorf("[usecase][AddUser] error when publish message %v", err)
