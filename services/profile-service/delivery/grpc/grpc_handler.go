@@ -18,12 +18,16 @@ func (profileServer ProfileServer) GetProfile(ctx context.Context, params *model
 	}
 
 	var profile *models.Profile = &models.Profile{}
-	profile.ID = int64(pf.ID)
-	profile.UserID = int64(pf.UserId)
+	profile.ID =pf.ID
+	profile.UserID = pf.UserId
 	profile.Address = pf.Address
 	profile.WorkAt = pf.WorkAt
 	profile.PhoneNumber = pf.PhoneNumber
 	profile.Gender = pf.Gender
+	profile.IsActive = pf.IsActive
+	profile.CreatedAt = pf.CreatedAt.String()
+	profile.UpdatedAt = pf.UpdatedAt.String()
+
 
 	return profile, nil
 }

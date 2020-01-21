@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package protocs;
 
-import "google/protobuf/empty.proto";
 
 message Profile{
     int64 ID = 1;
@@ -12,6 +11,8 @@ message Profile{
     string PhoneNumber = 5;
     string Gender = 6;
     bool IsActive = 7;
+    string CreatedAt = 8;
+    string UpdatedAt = 9;
 }
 
 message UserGetProfileArguments {

@@ -29,6 +29,8 @@ func (profileUsecase *profileUsecase) Get(userID int64) (profile models.ProfileT
 func (profileUsecase *profileUsecase) Add(profile models.ProfileTable) (err error) {
 	profile.CreatedAt = time.Now()
 	profile.UpdatedAt = time.Now()
+	profile.IsActive = true
+
 	err = profileUsecase.profileRepository.Add(&profile)
 
 	if err != nil {

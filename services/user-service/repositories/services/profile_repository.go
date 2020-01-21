@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
 	models2 "github.com/sjuliper7/silhouette/commons/models"
@@ -32,7 +31,7 @@ func NewProfileRepository() (repositories.ProfileRepository, error) {
 
 func (repo profileRepository) Get(userID int64) (profile models.Profile, err error) {
 	profile = models.Profile{}
-	result, err := repo.clientProfile.GetProfile(context.Background(), &models2.UserGetProfileArguments{
+	rProfile, err := repo.clientProfile.GetProfile(context.Background(), &models2.UserGetProfileArguments{
 		UserID: userID,
 	})
 
@@ -41,13 +40,15 @@ func (repo profileRepository) Get(userID int64) (profile models.Profile, err err
 		return profile, err
 	}
 
-	temp, err := json.Marshal(result)
-	if err != nil {
-		logrus.Errorf("[repository][profile-service][GetProfile] error when marshall to json %v", err)
-		return profile, err
-	}
-
-	json.Unmarshal(temp, &profile)
+	profile.ID = rProfile.ID
+	profile.Address = rProfile.Address
+	profile.WorkAt = rProfile.WorkAt
+	profile.PhoneNumber = rProfile.PhoneNumber
+	profile.Gender = rProfile.Gender
+	profile.IsActive = rProfile.IsActive
+	profile.UserID = rProfile.UserID
+	profile.CreatedAt = rProfile.CreatedAt
+	profile.UpdatedAt = rProfile.UpdatedAt
 
 	return profile, nil
 }

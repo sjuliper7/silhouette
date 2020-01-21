@@ -3,6 +3,7 @@ package mysql
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"github.com/sjuliper7/silhouette/services/profile-service/helper"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
 	"github.com/sjuliper7/silhouette/services/profile-service/repositories"
 )
@@ -16,17 +17,35 @@ func NewMysqlProfileRepository(conn *sqlx.DB) repositories.Repository {
 }
 
 func (profileRepository *mysqlRepository) Get(userID int64) (profile models.ProfileTable, err error) {
-	sql := `SELECT id, user_id, address, work_at, phone_number, gender, created_at, updated_at FROM profiles WHERE user_id = ?`
+	sql := `SELECT id, user_id, address, work_at, phone_number, gender, created_at, updated_at FROM profiles WHERE user_id = ? and is_active = 1`
 
-	stmt, err := profileRepository.Conn.Preparex(sql)
+	rows, err := profileRepository.Conn.Queryx(sql, userID)
 
 	if err != nil {
-		logrus.Errorf("[profileRepository][Get] error when prepare the query %v", err)
+		logrus.Errorf("[profileRepository][Get] error when queries %v", err)
+		return profile, nil
 	}
 
-	err = stmt.Get(&profile, userID)
-	if err != nil {
-		logrus.Errorf("[profileRepository][Get] error when getting value, %v", err)
+	defer rows.Close()
+
+	for rows.Next() {
+		temp := models.PortfolioTableScanner{}
+
+		err := rows.StructScan(&temp)
+		if err != nil {
+			logrus.Errorf("[profileRepository][Get] error when scanning values %v", err)
+			return profile, nil
+		}
+
+		profile.ID = temp.ID.Int64
+		profile.IsActive = temp.IsActive.Bool
+		profile.Gender = temp.Gender.String
+		profile.PhoneNumber = temp.PhoneNumber.String
+		profile.WorkAt = temp.WorkAt.String
+		profile.Address = temp.Address.String
+		profile.UserId = temp.UserId.Int64
+		profile.CreatedAt = helper.ParseStringToTime(temp.CreatedAt.String)
+		profile.UpdatedAt = helper.ParseStringToTime(temp.UpdatedAt.String)
 	}
 
 	return profile, nil
@@ -74,7 +93,7 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 		return err
 	}
 
-	profile.ID = uint64(temp)
+	profile.ID = temp
 
 	err = tx.Commit()
 	if err != nil {
