@@ -3,10 +3,10 @@ package usecase
 import (
 	"encoding/json"
 	"github.com/sirupsen/logrus"
+	"github.com/sjuliper7/silhouette/commons/constans"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories"
 	"time"
-	"github.com/sjuliper7/silhouette/commons/constans"
 )
 
 type userUsecase struct {
@@ -88,16 +88,7 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		logrus.Errorf("[usecase][AddUser] error when publish message %v", err)
 		return err
 	}
-
-	user.ID = userTable.ID
-	user.Name = userTable.Name
-	user.Username = userTable.Username
-	user.Email = userTable.Email
-	user.Role = userTable.Role
-	user.CreatedAt = userTable.CreatedAt
-	user.UpdatedAt = userTable.CreatedAt
-	user.Profile = profile
-
+	
 	return nil
 }
 
@@ -140,41 +131,48 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 		return user, err
 	}
 
-	user.Role = us.Role
-	user.Email = us.Email
-	user.Username = us.Username
-	user.Name = us.Name
-	user.UpdatedAt = us.UpdatedAt
+	userTable.Role = us.Role
+	userTable.Email = us.Email
+	userTable.Username = us.Username
+	userTable.Name = us.Name
+	userTable.UpdatedAt = us.UpdatedAt
 
 	err = uc.userRepo.Update(&userTable)
 
+	//if err != nil {
+	//	logrus.Errorf("[usecase][Update] Error when calling [repositories][Update] %v", err)
+	//	return user, err
+	//}
+	//
+	//profile := models.Profile{
+	//	ID:          0,
+	//	UserID:      userTable.ID,
+	//	Address:     us.Profile.Address,
+	//	WorkAt:      us.Profile.WorkAt,
+	//	PhoneNumber: us.Profile.PhoneNumber,
+	//	Gender:      us.Profile.Gender,
+	//}
+	//
+	//jsonData, err := json.Marshal(profile)
+	//
+	//if err != nil {
+	//	logrus.Errorf("[usecase][Update] error when marshall data %v", err)
+	//	return user, err
+	//}
+	//
+	//err = uc.kafkaRepo.PublishMessage("update-finish", jsonData)
+	//
+	//if err != nil {
+	//	logrus.Errorf("[usecase][Update] error when publish message %v", err)
+	//	return user, err
+	//}
+
+	user, err = uc.Get(userTable.ID)
 	if err != nil {
-		logrus.Errorf("[usecase][Update] Error when calling [repositories][Update] %v", err)
+		logrus.Errorf("[usecase][Update] Error when calling [repositories][Get] %v", err)
 		return user, err
 	}
 
-	profile := models.Profile{
-		ID:          0,
-		UserID:      userTable.ID,
-		Address:     us.Profile.Address,
-		WorkAt:      us.Profile.WorkAt,
-		PhoneNumber: us.Profile.PhoneNumber,
-		Gender:      us.Profile.Gender,
-	}
-
-	jsonData, err := json.Marshal(profile)
-
-	if err != nil {
-		logrus.Errorf("[usecase][Update] error when marshall data %v", err)
-		return user, err
-	}
-
-	err = uc.kafkaRepo.PublishMessage("update-finish", jsonData)
-
-	if err != nil {
-		logrus.Errorf("[usecase][Update] error when publish message %v", err)
-		return user, err
-	}
 
 	return user, nil
 }

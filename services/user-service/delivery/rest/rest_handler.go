@@ -37,6 +37,13 @@ func (userServerRest UserServerRest) postUser(w http.ResponseWriter, r *http.Req
 	user.Profile = profile
 
 	err := userServerRest.usecase.Add(&user)
+
+	if err != nil {
+		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	user, err = userServerRest.usecase.Get(user.ID)
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())

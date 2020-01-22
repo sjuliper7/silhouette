@@ -101,11 +101,13 @@ func (repo *userMysqlRepository) Get(userID int64) (user models.UserTable, err e
 
 func (repo *userMysqlRepository) Update(user *models.UserTable) (err error) {
 	logrus.Infof("[user-repository][Update] start update user: %v", user.ID)
+	logrus.Infof("user : %v", user)
 	tx, err := repo.Conn.Beginx()
 	if err != nil {
 		logrus.Errorf("[user-repository][Update] error while creating transactions %v", err)
 		return  err
 	}
+
 
 	defer tx.Rollback()
 
