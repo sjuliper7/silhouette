@@ -53,6 +53,7 @@ func initRestService(cg *Config) {
 	kafkaRepo := kafkaProducer.NewKafkaRepository(cg.KafkaProducer)
 	userRepo := mysql.NewUserMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
+
 	if err != nil {
 		logrus.Infof("Error when to connect grpc to profile service %v", err)
 	}

@@ -10,7 +10,7 @@ type ProfileServiceMock struct {
 	mock.Mock
 }
 
-func (m *ProfileServiceMock) GetProfile(userID int64) (profile models.Profile, err error) {
+func (m *ProfileServiceMock) Get(userID int64) (profile models.Profile, err error) {
 	logrus.Infof("getting profile with user_id %v", userID)
 	args := m.Called(userID)
 	return args.Get(0).(models.Profile), args.Error(1)

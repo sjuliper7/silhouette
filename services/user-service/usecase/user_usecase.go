@@ -34,8 +34,8 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 		user.Email = u.Email
 		user.Name = u.Name
 		user.Role = u.Role
-		user.CreatedAt = u.CreatedAt
-		user.UpdatedAt = u.UpdatedAt
+		user.CreatedAt = u.CreatedAt.String()
+		user.UpdatedAt = u.UpdatedAt.String()
 
 		users = append(users, user)
 	}
@@ -66,6 +66,8 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		logrus.Errorf("[usecase][Add] failed when call [repositories][Add] %v", err)
 		return err
 	}
+
+	user.ID = userTable.ID
 
 	profile := models.Profile{
 		Address:     user.Profile.Address,
@@ -106,8 +108,8 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	user.Email = ut.Email
 	user.Name = ut.Name
 	user.ID = ut.ID
-	user.CreatedAt = ut.CreatedAt
-	user.UpdatedAt = ut.UpdatedAt
+	user.CreatedAt = ut.CreatedAt.String()
+	user.UpdatedAt = ut.UpdatedAt.String()
 
 	var profile models.Profile = models.Profile{}
 	profile, err = uc.profileRepo.Get(userID)
@@ -135,7 +137,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	userTable.Email = us.Email
 	userTable.Username = us.Username
 	userTable.Name = us.Name
-	userTable.UpdatedAt = us.UpdatedAt
+	userTable.UpdatedAt = time.Now()
 
 	err = uc.userRepo.Update(&userTable)
 

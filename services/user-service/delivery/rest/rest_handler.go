@@ -6,7 +6,6 @@ import (
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func (userServerRest UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +86,6 @@ func (userServerRest UserServerRest) updateUser(w http.ResponseWriter, r *http.R
 	user.Email = r.FormValue("email")
 	user.Name = r.FormValue("name")
 	user.Role = r.FormValue("role")
-	user.UpdatedAt = time.Now()
 
 	profile := models.Profile{
 		UserID:      user.ID,

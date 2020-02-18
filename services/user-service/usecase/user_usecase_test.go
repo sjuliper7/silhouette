@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repositories/mocks"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +28,7 @@ func TestUserUsecase_GetAllUser(t *testing.T) {
 	mockListUser = append(mockListUser, mockUser)
 
 	t.Run("success", func(t *testing.T) {
-		mockUserRepo.On("GetAllUser").Return(
+		mockUserRepo.On("GetAll").Return(
 			mockListUser,
 			nil).
 			Once()
@@ -42,11 +42,13 @@ func TestUserUsecase_GetAllUser(t *testing.T) {
 		}
 
 		mockProfileRepo := new(mocks.ProfileServiceMock)
-		mockProfileRepo.On("GetProfile", mock.AnythingOfType("int64")).Return(mockProfile, nil)
+		mockProfileRepo.On("Get", mock.AnythingOfType("int64")).Return(mockProfile, nil)
 
-		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo)
+		mockKafkaRepo := new(mocks.KafkaRepositoryMock)
 
-		listOfUser, err := userCase.GetAllUser()
+		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo, mockKafkaRepo)
+
+		listOfUser, err := userCase.GetAll()
 		assert.NoError(t, err)
 		assert.Len(t, listOfUser, len(mockListUser))
 
@@ -56,15 +58,16 @@ func TestUserUsecase_GetAllUser(t *testing.T) {
 
 	t.Run("error-failed", func(t *testing.T) {
 		uu := make([]models.UserTable, 0)
-		mockUserRepo.On("GetAllUser").Return(
+		mockUserRepo.On("GetAll").Return(
 			uu,
-			errors.New("Unexpected Error")).
+			errors.New("unexpected error")).
 			Once()
 
 		mockProfileRepo := new(mocks.ProfileServiceMock)
+		mockKafkaRepo := new(mocks.KafkaRepositoryMock)
 
-		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo)
-		listOfUser, err := userCase.GetAllUser()
+		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo, mockKafkaRepo)
+		listOfUser, err := userCase.GetAll()
 		assert.NoError(t, err)
 		assert.Len(t, listOfUser, 0)
 

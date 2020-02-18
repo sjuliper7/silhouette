@@ -15,7 +15,7 @@ type fields struct {
 	DB *sqlx.DB
 }
 
-func TestMysqlRepository_GetAlluser(t *testing.T) {
+func TestMysqlRepository_GetAll(t *testing.T) {
 
 	tMock := time.Now()
 
@@ -72,7 +72,7 @@ func TestMysqlRepository_GetAlluser(t *testing.T) {
 
 		mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
 
-		resultMock, err := repo.GetAlluser()
+		resultMock, err := repo.GetAll()
 		if err != nil {
 			t.Errorf("Error When call GetAllUser")
 		}
@@ -84,7 +84,7 @@ func TestMysqlRepository_GetAlluser(t *testing.T) {
 
 }
 
-func TestMysqlRepository_AddUser(t *testing.T) {
+func TestMysqlRepository_Add(t *testing.T) {
 	mockDB, mock, err := sqlmock.New()
 
 	if err != nil {
@@ -111,13 +111,13 @@ func TestMysqlRepository_AddUser(t *testing.T) {
 
 		r := &userMysqlRepository{Conn: sx}
 
-		err := r.AddUser(&user)
+		err := r.Add(&user)
 		assert.NoError(t, err)
 		assert.Equal(t, uint64(1), user.ID)
 	})
 }
 
-func TestUserMysqlRepository_UpdateUser(t *testing.T) {
+func TestUserMysqlRepository_Update(t *testing.T) {
 	tMock := time.Now()
 	dbMock, mock, err := sqlmock.New()
 
@@ -155,13 +155,13 @@ func TestUserMysqlRepository_UpdateUser(t *testing.T) {
 			user.ID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err := repo.UpdateUser(&user)
+		err := repo.Update(&user)
 		assert.NoError(t, err)
 	})
 
 }
 
-func TestMysqlRepository_GetUser(t *testing.T) {
+func TestMysqlRepository_Get(t *testing.T) {
 	tMock := time.Now()
 	mockDb, mock, err := sqlmock.New()
 	sx := sqlx.NewDb(mockDb, "mockbd")
@@ -206,7 +206,7 @@ func TestMysqlRepository_GetUser(t *testing.T) {
 			mock.ExpectPrepare(rgxQuery)
 			mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
 
-			if got, _ := r.GetUser(1); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := r.Get(1); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("mysqlRepository.GetUser(userID) = %v, want %v", got, tt.want)
 			}
 
@@ -233,7 +233,7 @@ func TestUserMysqlRepository_DeleteUser(t *testing.T) {
 		prep := mock.ExpectPrepare(rgxQuery)
 		prep.ExpectExec().WithArgs(1).WillReturnResult(sqlmock.NewResult(1,1))
 
-		_, err := repo.DeleteUser(1)
+		_, err := repo.Delete(1)
 
 		assert.NoError(t, err)
 	})
