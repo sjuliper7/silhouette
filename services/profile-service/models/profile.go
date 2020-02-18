@@ -6,8 +6,8 @@ import (
 )
 
 type ProfileTable struct {
-	ID          int64    `db:"id" json:"id"`
-	UserId      int64    `db:"user_id" json:"user_id"`
+	ID          int64     `db:"id" json:"id"`
+	UserId      int64     `db:"user_id" json:"user_id"`
 	Address     string    `db:"address" json:"address"`
 	WorkAt      string    `db:"work_at" json:"work_at"`
 	PhoneNumber string    `db:"phone_number" json:"phone_number"`
@@ -27,4 +27,14 @@ type PortfolioTableScanner struct {
 	IsActive    sql.NullBool   `db:"is_active"`
 	CreatedAt   sql.NullString `db:"created_at"`
 	UpdatedAt   sql.NullString `db:"updated_at"`
+}
+
+type OutputKafkaProfile struct {
+	ID          int64  `json:"id"`
+	UserId      int64  `json:"user_id"`
+	Address     string `json:"address"`
+	WorkAt      string `json:"work_at"`
+	PhoneNumber string `json:"phone_number"`
+	Gender      string `json:"gender"`
+	IsActive    bool   `json:"is_active"`
 }

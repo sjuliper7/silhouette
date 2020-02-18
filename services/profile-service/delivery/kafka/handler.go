@@ -10,9 +10,17 @@ import (
 
 func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
 	logrus.Infof("request : %v", string(message.Value))
-	profile := models.ProfileTable{}
-	err = json.Unmarshal(message.Value, &profile)
+	outputProfile := models.OutputKafkaProfile{}
+	err = json.Unmarshal(message.Value, &outputProfile)
 	helper.CheckError(err)
+
+	profile := models.ProfileTable{}
+	profile.IsActive = true
+	profile.Gender = outputProfile.Gender
+	profile.PhoneNumber = outputProfile.PhoneNumber
+	profile.WorkAt = outputProfile.WorkAt
+	profile.Address = outputProfile.Address
+	profile.UserId = outputProfile.UserId
 
 	err = kafkaService.profileUsecase.Add(profile)
 	if err != nil {
