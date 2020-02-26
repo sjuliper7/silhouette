@@ -69,15 +69,15 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 
 	user.ID = userTable.ID
 
-	profile := models.Profile{
-		Address:     user.Profile.Address,
-		UserID:      userTable.ID,
-		WorkAt:      user.Profile.WorkAt,
-		PhoneNumber: user.Profile.PhoneNumber,
-		Gender:      user.Profile.Gender,
+	message := map[string]interface{}{
+		"user_id":      userTable.ID,
+		"address":      user.Profile.Address,
+		"work_at":      user.Profile.WorkAt,
+		"phone_number": user.Profile.PhoneNumber,
+		"gender":       user.Profile.Gender,
 	}
 
-	jsonData, err := json.Marshal(profile)
+	jsonData, err := json.Marshal(message)
 
 	if err != nil {
 		logrus.Errorf("[usecase][Add] failed when marshall %v", err)
@@ -90,7 +90,7 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		logrus.Errorf("[usecase][AddUser] error when publish message %v", err)
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -141,40 +141,38 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 
 	err = uc.userRepo.Update(&userTable)
 
-	//if err != nil {
-	//	logrus.Errorf("[usecase][Update] Error when calling [repositories][Update] %v", err)
-	//	return user, err
-	//}
-	//
-	//profile := models.Profile{
-	//	ID:          0,
-	//	UserID:      userTable.ID,
-	//	Address:     us.Profile.Address,
-	//	WorkAt:      us.Profile.WorkAt,
-	//	PhoneNumber: us.Profile.PhoneNumber,
-	//	Gender:      us.Profile.Gender,
-	//}
-	//
-	//jsonData, err := json.Marshal(profile)
-	//
-	//if err != nil {
-	//	logrus.Errorf("[usecase][Update] error when marshall data %v", err)
-	//	return user, err
-	//}
-	//
-	//err = uc.kafkaRepo.PublishMessage("update-finish", jsonData)
-	//
-	//if err != nil {
-	//	logrus.Errorf("[usecase][Update] error when publish message %v", err)
-	//	return user, err
-	//}
+	if err != nil {
+		logrus.Errorf("[usecase][Update] Error when calling [repositories][Update] %v", err)
+		return us, err
+	}
+
+	message := map[string]interface{}{
+		"user_id":      userTable.ID,
+		"address":      us.Profile.Address,
+		"work_at":      us.Profile.WorkAt,
+		"phone_number": us.Profile.PhoneNumber,
+		"gender":       us.Profile.Gender,
+	}
+
+	jsonData, err := json.Marshal(message)
+
+	if err != nil {
+		logrus.Errorf("[usecase][Update] error when marshall data %v , %v", us, err)
+		return us, err
+	}
+
+	err = uc.kafkaRepo.PublishMessage(string(constans.TopicUserUpdated), jsonData)
+
+	if err != nil {
+		logrus.Errorf("[usecase][Update] error when publish message, %v ,%v", us, err)
+		return user, err
+	}
 
 	user, err = uc.Get(userTable.ID)
 	if err != nil {
 		logrus.Errorf("[usecase][Update] Error when calling [repositories][Get] %v", err)
 		return user, err
 	}
-
 
 	return user, nil
 }
@@ -184,6 +182,24 @@ func (uc userUsecase) Delete(userID int64) (deleted bool, err error) {
 
 	if err != nil {
 		logrus.Errorf("[usecase][Delete] Error when calling [repositories][delete] %v", err)
+		return false, err
+	}
+
+	message := map[string]interface{}{
+		"user_id":      userID,
+	}
+
+	jsonData, err := json.Marshal(message)
+
+	if err != nil {
+		logrus.Errorf("[usecase][Delete] error when marshall data %v , %v", userID, err)
+		return false, err
+	}
+
+	err = uc.kafkaRepo.PublishMessage(string(constans.TopicUserDeleted), jsonData)
+
+	if err != nil {
+		logrus.Errorf("[usecase][Delete] error when publish message, %v ,%v", userID, err)
 		return false, err
 	}
 

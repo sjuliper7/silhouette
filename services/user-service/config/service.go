@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/koinworks/asgard-heimdal/libs/logger"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
 	"github.com/sjuliper7/silhouette/commons/models"
@@ -26,7 +25,7 @@ func initRpcService(cg *Config) {
 	userRepo := mysql.NewUserMysqlRepository(cg.DB)
 	profileRepo, err := services.NewProfileRepository()
 	if err != nil {
-		logger.Errf("Error when to connect grpc to profile service, %v", err)
+		logrus.Errorf("Error when to connect grpc to profile service, %v", err)
 	}
 
 	kafkaRepository := kafkaProducer.NewKafkaRepository(cg.KafkaProducer)

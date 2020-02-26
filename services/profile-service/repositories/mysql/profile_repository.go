@@ -151,7 +151,7 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 	return nil
 }
 
-func (profileRepository *mysqlRepository) Delete(profileID int64) (deleted bool, err error) {
+func (profileRepository *mysqlRepository) Delete(userID int64) (deleted bool, err error) {
 	tx, err := profileRepository.Conn.Beginx()
 	if err != nil {
 		logrus.Errorf("[profileRepository][Delete] error when creating transaction, %v", err)
@@ -160,14 +160,14 @@ func (profileRepository *mysqlRepository) Delete(profileID int64) (deleted bool,
 
 	defer tx.Rollback()
 
-	sql := `UPDATE profiles SET is_active = false where id =?`
+	sql := `UPDATE profiles SET is_active = false where user_id =?`
 
 	stmt, err := tx.Preparex(sql)
 	if err != nil {
 		logrus.Errorf("[profileRepository][Delete] error when prepare the query, %v", err)
 		return false, err
 	}
-	_, err = stmt.Exec(profileID)
+	_, err = stmt.Exec(userID)
 
 	if err != nil {
 		logrus.Errorf("[profileRepository][Delete] error when exec the query with value, %v ", err)
@@ -180,7 +180,7 @@ func (profileRepository *mysqlRepository) Delete(profileID int64) (deleted bool,
 		return false, err
 	}
 
-	logrus.Infof("[profileRepository][Delete] successfully to deleted : %v", profileID)
+	logrus.Infof("[profileRepository][Delete] successfully to deleted profile user id : %v", userID)
 
 	return true, nil
 }

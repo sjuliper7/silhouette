@@ -19,7 +19,7 @@ func (profileUsecase *profileUsecase) Get(userID int64) (profile models.ProfileT
 	profile, err = profileUsecase.profileRepository.Get(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][GetUser] error when calling get user [profileRepository][Get], %v ", err)
+		logrus.Errorf("[usecase][GetProfile] error when calling get user [profileRepository][Get], %v ", err)
 		return profile, err
 	}
 
@@ -42,6 +42,17 @@ func (profileUsecase *profileUsecase) Add(profile models.ProfileTable) (err erro
 }
 
 func (profileUsecase *profileUsecase) Update(profile models.ProfileTable) (err error) {
+
+	pf, err := profileUsecase.profileRepository.Get(profile.UserId)
+
+	if err != nil {
+		logrus.Errorf("[usecase][GetProfile] error when calling get user [profileRepository][Get], %v ", err)
+		return  err
+	}
+
+	profile.ID = pf.ID
+	profile.CreatedAt = pf.CreatedAt
+
 	err = profileUsecase.profileRepository.Update(&profile)
 
 	if err != nil {
@@ -52,8 +63,8 @@ func (profileUsecase *profileUsecase) Update(profile models.ProfileTable) (err e
 	return  nil
 }
 
-func (profileUsecase *profileUsecase) Delete(profileID int64) (err error){
-	deleted, err := profileUsecase.profileRepository.Delete(profileID)
+func (profileUsecase *profileUsecase) Delete(userID int64) (err error){
+	deleted, err := profileUsecase.profileRepository.Delete(userID)
 
 	if err != nil {
 		logrus.Errorf("[usecase][DeleteProfile] error when calling [profileRepository][Delete], %v", err)

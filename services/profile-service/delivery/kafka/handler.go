@@ -6,6 +6,7 @@ import (
 	"github.com/sjuliper7/silhouette/services/profile-service/helper"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"time"
 )
 
 func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
@@ -33,9 +34,21 @@ func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
 
 func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
 	logrus.Infof("request : %v", string(message.Value))
-	profile := models.ProfileTable{}
-	err = json.Unmarshal(message.Value, &profile)
+
+	temp := models.OutputKafkaProfile{}
+
+	err = json.Unmarshal(message.Value, &temp)
 	helper.CheckError(err)
+
+	profile := models.ProfileTable{
+		UserId:      temp.UserId,
+		Address:     temp.Address,
+		WorkAt:      temp.WorkAt,
+		PhoneNumber: temp.PhoneNumber,
+		Gender:      temp.Gender,
+		IsActive: true,
+		UpdatedAt: time.Now(),
+	}
 
 	err = kafkaService.profileUsecase.Update(profile)
 
@@ -47,18 +60,18 @@ func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
 	return nil
 }
 
-func (kafkaService kafkaSvc) deleteProfile(message *kafka.Message) ( err error) {
+func (kafkaService kafkaSvc) deleteProfile(message *kafka.Message) (err error) {
 	logrus.Infof("request : %v", string(message.Value))
 	profile := models.ProfileTable{}
 	err = json.Unmarshal(message.Value, &profile)
 	helper.CheckError(err)
 
-	err = kafkaService.profileUsecase.Delete(int64(profile.ID))
+	err = kafkaService.profileUsecase.Delete(int64(profile.UserId))
 
 	if err != nil {
 		logrus.Errorf("[kafka-handler][updateProfile] error when deleting profile %v", err)
-		return  err
+		return err
 	}
 
-	return  nil
+	return nil
 }
