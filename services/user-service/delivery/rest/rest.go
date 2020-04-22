@@ -1,9 +1,10 @@
 package rest
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
-	"net/http"
 )
 
 // UserServerRest  represent the http handler for users

@@ -2,11 +2,12 @@ package kafka
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/profile-service/helper"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"time"
 )
 
 func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
@@ -46,8 +47,8 @@ func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
 		WorkAt:      temp.WorkAt,
 		PhoneNumber: temp.PhoneNumber,
 		Gender:      temp.Gender,
-		IsActive: true,
-		UpdatedAt: time.Now(),
+		IsActive:    true,
+		UpdatedAt:   time.Now(),
 	}
 
 	err = kafkaService.profileUsecase.Update(profile)

@@ -1,6 +1,9 @@
 package config
 
 import (
+	"net"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
@@ -12,8 +15,6 @@ import (
 	"github.com/sjuliper7/silhouette/services/user-service/repositories/services"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
 	"google.golang.org/grpc"
-	"net"
-	"net/http"
 )
 
 func (cf *Config) initService() {

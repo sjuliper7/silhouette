@@ -1,14 +1,15 @@
 package config
 
 import (
+	"net"
+
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
 	"github.com/sjuliper7/silhouette/commons/models"
 	grpc2 "github.com/sjuliper7/silhouette/services/profile-service/delivery/grpc"
+	kafkaC "github.com/sjuliper7/silhouette/services/profile-service/delivery/kafka"
 	"github.com/sjuliper7/silhouette/services/profile-service/repositories/mysql"
 	"google.golang.org/grpc"
-	"net"
-	kafkaC "github.com/sjuliper7/silhouette/services/profile-service/delivery/kafka"
 
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"
 )
@@ -24,7 +25,7 @@ func (cf *Config) initService() {
 	logrus.Infof("starting RPC server at %v", config.SERVICE_PROFILE_PORT)
 
 	err := kafkaC.ConsumeHandler(cf.KafkaConsumer, profileUc)
-	if err != nil{
+	if err != nil {
 		logrus.Println("[config][service] failed to start consuming from kafka")
 	}
 

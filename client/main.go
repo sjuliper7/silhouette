@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
