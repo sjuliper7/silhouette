@@ -5,17 +5,17 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/constans"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories"
+	"github.com/sjuliper7/silhouette/services/user-service/repository"
 	"time"
 )
 
 type userUsecase struct {
-	userRepo    repositories.UserRepository
-	profileRepo repositories.ProfileRepository
-	kafkaRepo   repositories.KafkaRepository
+	userRepo    repository.UserRepository
+	profileRepo repository.ProfileRepository
+	kafkaRepo   repository.KafkaRepository
 }
 
-func NewUserUsecase(userRepo repositories.UserRepository, profileRepo repositories.ProfileRepository, kafkaRepo repositories.KafkaRepository) UserUsecase {
+func NewUserUsecase(userRepo repository.UserRepository, profileRepo repository.ProfileRepository, kafkaRepo repository.KafkaRepository) UserUsecase {
 	return userUsecase{userRepo, profileRepo, kafkaRepo}
 }
 
@@ -23,7 +23,7 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 	usersTable, err := uc.userRepo.GetAll()
 
 	if err != nil {
-		logrus.Errorf("[usecase][GetAll] failed when call [repositories][GetAll] %v", err)
+		logrus.Errorf("[usecase][GetAll] failed when call [repository][GetAll] %v", err)
 		return nil, err
 	}
 
@@ -63,7 +63,7 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 
 	err = uc.userRepo.Add(&userTable)
 	if err != nil {
-		logrus.Errorf("[usecase][Add] failed when call [repositories][Add] %v", err)
+		logrus.Errorf("[usecase][Add] failed when call [repository][Add] %v", err)
 		return err
 	}
 
@@ -99,7 +99,7 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	ut, err = uc.userRepo.Get(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][Get] Error when calling [repositories][Get] %v", err)
+		logrus.Errorf("[usecase][Get] Error when calling [repository][Get] %v", err)
 		return user, err
 	}
 
@@ -115,7 +115,7 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	profile, err = uc.profileRepo.Get(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][Get] Error when calling [repositories][Get] %v", err)
+		logrus.Errorf("[usecase][Get] Error when calling [repository][Get] %v", err)
 		return user, err
 	}
 
@@ -129,7 +129,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	userTable, err := uc.userRepo.Get(int64(us.ID))
 
 	if err != nil {
-		logrus.Errorf("[usecase][Update] Error when calling [repositories][Get] %v", err)
+		logrus.Errorf("[usecase][Update] Error when calling [repository][Get] %v", err)
 		return user, err
 	}
 
@@ -142,7 +142,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	err = uc.userRepo.Update(&userTable)
 
 	if err != nil {
-		logrus.Errorf("[usecase][Update] Error when calling [repositories][Update] %v", err)
+		logrus.Errorf("[usecase][Update] Error when calling [repository][Update] %v", err)
 		return us, err
 	}
 
@@ -170,7 +170,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 
 	user, err = uc.Get(userTable.ID)
 	if err != nil {
-		logrus.Errorf("[usecase][Update] Error when calling [repositories][Get] %v", err)
+		logrus.Errorf("[usecase][Update] Error when calling [repository][Get] %v", err)
 		return user, err
 	}
 
@@ -181,7 +181,7 @@ func (uc userUsecase) Delete(userID int64) (deleted bool, err error) {
 	deleted, err = uc.userRepo.Delete(userID)
 
 	if err != nil {
-		logrus.Errorf("[usecase][Delete] Error when calling [repositories][delete] %v", err)
+		logrus.Errorf("[usecase][Delete] Error when calling [repository][delete] %v", err)
 		return false, err
 	}
 
@@ -211,7 +211,7 @@ func (uc *userUsecase) fillProfileDetails(users []models.User) ([]models.User, e
 		profile, err := uc.profileRepo.Get(int64(users[i].ID))
 
 		if err != nil {
-			logrus.Errorf("[usecase][fillProfileDetails] Error when calling [repositories-profile][Get]")
+			logrus.Errorf("[usecase][fillProfileDetails] Error when calling [repository-profile][Get]")
 			return users, err
 		}
 

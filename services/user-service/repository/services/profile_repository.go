@@ -6,7 +6,7 @@ import (
 	"github.com/sjuliper7/silhouette/commons/config"
 	models2 "github.com/sjuliper7/silhouette/commons/models"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories"
+	"github.com/sjuliper7/silhouette/services/user-service/repository"
 	"google.golang.org/grpc"
 )
 
@@ -14,7 +14,7 @@ type profileRepository struct {
 	clientProfile models2.ProfilesClient
 }
 
-func NewProfileRepository() (repositories.ProfileRepository, error) {
+func NewProfileRepository() (repository.ProfileRepository, error) {
 	repo := profileRepository{}
 	profilePort := config.SERVICE_PROFILE_PORT
 	conn, err := grpc.Dial(profilePort, grpc.WithInsecure())

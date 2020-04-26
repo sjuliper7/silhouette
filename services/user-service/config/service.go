@@ -10,9 +10,9 @@ import (
 	"github.com/sjuliper7/silhouette/commons/models"
 	grpc_ "github.com/sjuliper7/silhouette/services/user-service/delivery/grpc"
 	"github.com/sjuliper7/silhouette/services/user-service/delivery/rest"
-	kafkaProducer "github.com/sjuliper7/silhouette/services/user-service/repositories/kafka"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories/mysql"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories/services"
+	kafkaProducer "github.com/sjuliper7/silhouette/services/user-service/repository/kafka"
+	"github.com/sjuliper7/silhouette/services/user-service/repository/mysql"
+	"github.com/sjuliper7/silhouette/services/user-service/repository/services"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
 	"google.golang.org/grpc"
 )

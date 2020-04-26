@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories"
+	"github.com/sjuliper7/silhouette/services/user-service/repository"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
@@ -12,7 +12,7 @@ type kafkaRepository struct {
 	kafkaProducer *kafka.Producer
 }
 
-func NewKafkaRepository(kafkaProducer *kafka.Producer) repositories.KafkaRepository {
+func NewKafkaRepository(kafkaProducer *kafka.Producer) repository.KafkaRepository {
 	return &kafkaRepository{kafkaProducer: kafkaProducer}
 }
 

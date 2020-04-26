@@ -4,7 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
-	"github.com/sjuliper7/silhouette/services/user-service/repositories"
+	"github.com/sjuliper7/silhouette/services/user-service/repository"
 )
 
 type userMysqlRepository struct {
@@ -12,7 +12,7 @@ type userMysqlRepository struct {
 }
 
 //NewMysqlRepository is to create new instance repository
-func NewUserMysqlRepository(conn *sqlx.DB) repositories.UserRepository {
+func NewUserMysqlRepository(conn *sqlx.DB) repository.UserRepository {
 	return &userMysqlRepository{conn}
 }
 
