@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
-	"github.com/sjuliper7/silhouette/services/user-service/delivery/rest"
+	"github.com/sjuliper7/silhouette/services/user-service/delivery/http/rest"
 	kafkaProducer "github.com/sjuliper7/silhouette/services/user-service/repository/kafka"
 	"github.com/sjuliper7/silhouette/services/user-service/repository/mysql"
 	"github.com/sjuliper7/silhouette/services/user-service/repository/services"
