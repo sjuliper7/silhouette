@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/services/profile-service/config"
 )
 
 func init() {
@@ -10,9 +9,9 @@ func init() {
 		FullTimestamp: true,
 	}
 	logrus.SetFormatter(formatter)
-	config.LoadConfig()
+	loadConfig()
 }
 
 func main() {
-	config.InitConfig()
+	initConfig()
 }
