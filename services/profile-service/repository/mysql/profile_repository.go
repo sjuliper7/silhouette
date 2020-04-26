@@ -5,14 +5,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/profile-service/helper"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
-	"github.com/sjuliper7/silhouette/services/profile-service/repositories"
+	"github.com/sjuliper7/silhouette/services/profile-service/repository"
 )
 
 type mysqlRepository struct {
 	Conn *sqlx.DB
 }
 
-func NewMysqlProfileRepository(conn *sqlx.DB) repositories.Repository {
+func NewMysqlProfileRepository(conn *sqlx.DB) repository.Repository {
 	return &mysqlRepository{Conn: conn}
 }
 

@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import "github.com/sjuliper7/silhouette/services/profile-service/models"
 

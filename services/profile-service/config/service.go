@@ -8,7 +8,7 @@ import (
 	"github.com/sjuliper7/silhouette/commons/models"
 	grpc2 "github.com/sjuliper7/silhouette/services/profile-service/delivery/grpc"
 	kafkaC "github.com/sjuliper7/silhouette/services/profile-service/delivery/kafka"
-	"github.com/sjuliper7/silhouette/services/profile-service/repositories/mysql"
+	"github.com/sjuliper7/silhouette/services/profile-service/repository/mysql"
 	"google.golang.org/grpc"
 
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"

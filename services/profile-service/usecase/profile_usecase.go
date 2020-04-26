@@ -3,15 +3,15 @@ package usecase
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/profile-service/models"
-	"github.com/sjuliper7/silhouette/services/profile-service/repositories"
+	"github.com/sjuliper7/silhouette/services/profile-service/repository"
 	"time"
 )
 
 type profileUsecase struct {
-	profileRepository repositories.Repository
+	profileRepository repository.Repository
 }
 
-func NewProfileUseCase(repo repositories.Repository) ProfileUseCase {
+func NewProfileUseCase(repo repository.Repository) ProfileUseCase {
 	return &profileUsecase{profileRepository: repo}
 }
 
