@@ -2,11 +2,13 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/models"
 )
 
-func (profileServer ProfileServer) GetProfile(ctx context.Context, params *models.UserGetProfileArguments) (*models.Profile, error) {
+//GetProfile ...
+func (profileServer ProfileService) GetProfile(ctx context.Context, params *models.UserGetProfileArguments) (*models.Profile, error) {
 	logrus.Infof("request : %v", params)
 
 	UserID := params.UserID
@@ -18,7 +20,7 @@ func (profileServer ProfileServer) GetProfile(ctx context.Context, params *model
 	}
 
 	var profile *models.Profile = &models.Profile{}
-	profile.ID =pf.ID
+	profile.ID = pf.ID
 	profile.UserID = pf.UserId
 	profile.Address = pf.Address
 	profile.WorkAt = pf.WorkAt
@@ -27,7 +29,6 @@ func (profileServer ProfileServer) GetProfile(ctx context.Context, params *model
 	profile.IsActive = pf.IsActive
 	profile.CreatedAt = pf.CreatedAt.String()
 	profile.UpdatedAt = pf.UpdatedAt.String()
-
 
 	return profile, nil
 }

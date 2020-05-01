@@ -1,14 +1,15 @@
 package rest
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
-	"net/http"
-	"strconv"
 )
 
-func (userServerRest UserServerRest) fetchUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) fetchUser(w http.ResponseWriter, r *http.Request) {
 	users, err := userServerRest.usecase.GetAll()
 	if err != nil {
 		logrus.Errorf("[delivery][fetchUser] error when call [user-usecase][GetAll], %v", err)
@@ -18,7 +19,7 @@ func (userServerRest UserServerRest) fetchUser(w http.ResponseWriter, r *http.Re
 	respondWithJSON(w, http.StatusOK, users)
 }
 
-func (userServerRest UserServerRest) postUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Request) {
 	var user = models.User{
 		Username: r.FormValue("username"),
 		Email:    r.FormValue("email"),
@@ -51,7 +52,7 @@ func (userServerRest UserServerRest) postUser(w http.ResponseWriter, r *http.Req
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (userServerRest UserServerRest) getUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) getUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -70,7 +71,7 @@ func (userServerRest UserServerRest) getUser(w http.ResponseWriter, r *http.Requ
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (userServerRest UserServerRest) updateUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -107,12 +108,12 @@ func (userServerRest UserServerRest) updateUser(w http.ResponseWriter, r *http.R
 	respondWithJSON(w, http.StatusOK, user)
 }
 
-func (userServerRest UserServerRest) deleteUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) deleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
-		logrus.Errorf("Error when casting getting user , %v",err)
+		logrus.Errorf("Error when casting getting user , %v", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 

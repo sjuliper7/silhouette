@@ -5,11 +5,11 @@ import (
 )
 
 // UserServer struct is  a struct to implement generated interface from proto
-type UserServer struct {
+type UserService struct {
 	usecase usecase.UserUsecase
 }
 
 //NewUserServer is function to implement usecase interface
-func NewUserServer(uc usecase.UserUsecase) UserServer {
-	return UserServer{uc}
+func NewUserServer(uc usecase.UserUsecase) UserService {
+	return UserService{uc}
 }

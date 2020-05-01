@@ -2,12 +2,13 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/models"
 )
 
-func (us UserServer) List(context.Context, *empty.Empty) (*models.UserList, error) {
+func (us UserService) List(context.Context, *empty.Empty) (*models.UserList, error) {
 	var userList models.UserList
 	var users []*models.User
 

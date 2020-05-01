@@ -8,12 +8,12 @@ import (
 )
 
 type emailRepository struct {
-	dialer gomail.Dialer
+	dialer *gomail.Dialer
 }
 
 // NewEmailRepository ...
 func NewEmailRepository(dialer *gomail.Dialer) repository.EmailRepository {
-	return emailRepository{dialer: dialer}
+	return &emailRepository{dialer: dialer}
 }
 
 func (repo *emailRepository) SentEmail(email model.Email) error {
@@ -21,7 +21,6 @@ func (repo *emailRepository) SentEmail(email model.Email) error {
 
 	mailer.SetHeader("From", email.Sender)
 	mailer.SetHeader("To", email.Receivers...)
-	mailer.SetAddressHeader("Cc", email.CCReceivers)
 	mailer.SetHeader("Subject", email.Subject)
 	mailer.SetBody("text/html", email.Message)
 

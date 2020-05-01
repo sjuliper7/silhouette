@@ -7,8 +7,8 @@ import (
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
 )
 
-// UserServerRest  represent the http handler for users
-type UserServerRest struct {
+// UserService  represent the http handler for users
+type UserService struct {
 	usecase usecase.UserUsecase
 }
 
@@ -17,11 +17,13 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-func NewUserServerRest(uc usecase.UserUsecase) UserServerRest {
-	return UserServerRest{usecase: uc}
+//NewUserServerRest ...
+func NewUserServerRest(uc usecase.UserUsecase) UserService {
+	return UserService{usecase: uc}
 }
 
-func (userServerRest UserServerRest) Resource(w http.ResponseWriter, r *http.Request) {
+//Resource ...
+func (userServerRest UserService) Resource(w http.ResponseWriter, r *http.Request) {
 	switch m := r.Method; m {
 	case http.MethodGet:
 		params := mux.Vars(r)
