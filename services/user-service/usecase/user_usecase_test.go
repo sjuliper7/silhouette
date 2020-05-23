@@ -45,6 +45,7 @@ package usecase
 // 		mockUserRepo.AssertExpectations(t)
 // 		mockProfileRepo.AssertExpectations(t)
 // 	})
+// }
 
 // 	t.Run("error-failed", func(t *testing.T) {
 // 		uu := make([]models.UserTable, 0)

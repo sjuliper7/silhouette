@@ -10,7 +10,7 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
+func (kafkaService kafkaDelivery) createProfile(message *kafka.Message) (err error) {
 	logrus.Infof("request : %v", string(message.Value))
 	outputProfile := models.OutputKafkaProfile{}
 	err = json.Unmarshal(message.Value, &outputProfile)
@@ -33,7 +33,7 @@ func (kafkaService kafkaSvc) createProfile(message *kafka.Message) (err error) {
 	return nil
 }
 
-func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
+func (kafkaService kafkaDelivery) updateProfile(message *kafka.Message) (err error) {
 	logrus.Infof("request : %v", string(message.Value))
 
 	temp := models.OutputKafkaProfile{}
@@ -61,7 +61,7 @@ func (kafkaService kafkaSvc) updateProfile(message *kafka.Message) (err error) {
 	return nil
 }
 
-func (kafkaService kafkaSvc) deleteProfile(message *kafka.Message) (err error) {
+func (kafkaService kafkaDelivery) deleteProfile(message *kafka.Message) (err error) {
 	logrus.Infof("request : %v", string(message.Value))
 	profile := models.ProfileTable{}
 	err = json.Unmarshal(message.Value, &profile)

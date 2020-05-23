@@ -8,26 +8,24 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-type kafkaSvc struct {
+type kafkaDelivery struct {
 	kafkaConsumer  *kafka.Consumer
 	profileUsecase usecase.ProfileUseCase
 }
 
-func (kafkaService kafkaSvc) topics() []string {
-	return []string{
-		string(constans.TopicUserRegistration),
-		string(constans.TopicUserUpdated),
-		string(constans.TopicUserDeleted),
-	}
+var kafkaTopics = []string{string(constans.TopicUserRegistration),
+	string(constans.TopicUserUpdated),
+	string(constans.TopicUserDeleted),
 }
 
-func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUseCase) error {
-	kafkaService := kafkaSvc{
+//Consume ...
+func Consume(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUseCase) error {
+	kafkaService := kafkaDelivery{
 		kafkaConsumer:  kafkaConsumer,
 		profileUsecase: profileUsecase,
 	}
 
-	kafkaService.kafkaConsumer.SubscribeTopics(kafkaService.topics(), nil)
+	kafkaService.kafkaConsumer.SubscribeTopics(kafkaTopics, nil)
 
 	go func() {
 		for {
@@ -43,16 +41,15 @@ func ConsumeHandler(kafkaConsumer *kafka.Consumer, profileUsecase usecase.Profil
 	return nil
 }
 
-func (kafkaService kafkaSvc) messageHandler(message *kafka.Message) {
+func (kafkaService kafkaDelivery) messageHandler(message *kafka.Message) {
 	topic := ""
+	var err error
 
 	if message.TopicPartition.Topic != nil {
 		topic = *message.TopicPartition.Topic
 	}
 
 	logrus.Infof("Receive message from kafka topic %v", topic)
-
-	var err error
 
 	switch {
 	case topic == string(constans.TopicUserRegistration):
