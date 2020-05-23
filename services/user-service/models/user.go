@@ -14,7 +14,7 @@ type User struct {
 	Profile   Profile `json:"profile"`
 }
 
-//User struct is representative form table user
+//UserTable struct is representative form table user
 type UserTable struct {
 	ID        int64     `db:"id"`
 	Username  string    `db:"username"`

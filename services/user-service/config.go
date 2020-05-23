@@ -5,21 +5,17 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
-	"github.com/sjuliper7/silhouette/commons/config"
-	"github.com/sjuliper7/silhouette/services/user-service/delivery/http/rest"
-	kafkaProducer "github.com/sjuliper7/silhouette/services/user-service/repository/kafka"
-	repository "github.com/sjuliper7/silhouette/services/user-service/repository/mysql"
-	"github.com/sjuliper7/silhouette/services/user-service/repository/services"
-	"github.com/sjuliper7/silhouette/services/user-service/usecase"
+
+	commonsConfig "github.com/sjuliper7/silhouette/commons/config"
+
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 //Config is struct to access all config
-type Config struct {
+type UserService struct {
 	DB            *sqlx.DB
 	KafkaProducer *kafka.Producer
 }
@@ -45,28 +41,7 @@ func populateStringConnection() string {
 	return stringConnection
 }
 
-func initRestService(cg *Config) {
-
-	kafkaRepo := kafkaProducer.NewKafkaRepository(cg.KafkaProducer)
-	userRepo := repository.NewUserMysqlRepository(cg.DB)
-	profileRepo, err := services.NewProfileRepository()
-	if err != nil {
-		logrus.Infof("Error when to connect grpc to profile service %v", err)
-	}
-
-	profileUsecase := usecase.NewUserUsecase(userRepo, profileRepo, kafkaRepo)
-
-	router := mux.NewRouter()
-	userRest := rest.NewUserServerRest(profileUsecase)
-	router.HandleFunc("/users", userRest.Resource).Methods("GET", "POST")
-	router.HandleFunc("/users/{id}", userRest.Resource).Methods("GET", "PUT", "DELETE")
-
-	logrus.Infof("Starting Rest API at %v", config.REST_USER_PORT)
-
-	http.ListenAndServe(config.REST_USER_PORT, router)
-}
-
-func (cfg *Config) initDatabase() {
+func (cfg *UserService) initDatabase() {
 	db, err := sqlx.Connect("mysql", populateStringConnection())
 
 	if err != nil {
@@ -78,7 +53,7 @@ func (cfg *Config) initDatabase() {
 	cfg.DB = db
 }
 
-func (cfg *Config) initKafka() (err error) {
+func (cfg *UserService) initKafka() (err error) {
 
 	cfg.KafkaProducer, err = kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": "127.0.0.1",
@@ -93,14 +68,12 @@ func (cfg *Config) initKafka() (err error) {
 	return nil
 }
 
-func (cfg *Config) initService() {
-	initRestService(cfg)
-}
-
 func startService() {
 
-	var config Config
-	config.initDatabase()
-	config.initKafka()
-	config.initService()
+	var userService UserService
+	userService.initDatabase()
+	userService.initKafka()
+	logrus.Infof("Starting Rest API at %v", commonsConfig.REST_USER_PORT)
+
+	http.ListenAndServe(commonsConfig.REST_USER_PORT, initRouter(userService.DB, userService.KafkaProducer))
 }
