@@ -30,7 +30,7 @@ func Consume(kafkaConsumer *kafka.Consumer, notificationCase usecase.Notificatio
 		for {
 			msg, err := kafkaSvc.kafkaConsumer.ReadMessage(-1)
 			if err != nil {
-				logrus.Errorf("[delivery][kafka][Consume] notifcation-service error occured on consumer %s, detail: %v (%v)", "", err, msg)
+				logrus.Errorf("[delivery][kafka][Consume] notifcation-service error consumer %s, detail: %v (%v)", "", err, msg)
 				continue
 			}
 			kafkaSvc.processingMessage(msg)

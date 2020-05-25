@@ -51,7 +51,7 @@ func (nfs *NotificationService) startKafka() (err error) {
 
 func (nfs *NotificationService) startEmailDialler() error {
 
-	ConfigEmail = os.Getenv("CONFIG_EMAI")
+	ConfigEmail = os.Getenv("CONFIG_EMAIL")
 	ConfigPassword = os.Getenv("CONFIG_PASSWORD")
 	ConfigSMTPHost = os.Getenv("CONFIG_SMTP_HOST")
 	port := os.Getenv("CONFIG_SMTP_PORT")
@@ -80,7 +80,7 @@ func (nfs *NotificationService) startService() {
 
 	err := kafkaC.Consume(nfs.KafkaConsumer, notificationUsecase)
 	if err != nil {
-		logrus.Println("[config][service] failed to start consuming from kafka")
+		logrus.Println("[config] failed to start consuming from kafka")
 	}
 
 	http.ListenAndServe(config.SERVICE_NOTIFICATION_PORT, LoadRouter())

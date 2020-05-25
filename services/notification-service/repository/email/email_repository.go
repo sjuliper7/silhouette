@@ -26,7 +26,7 @@ func (repo *emailRepository) SentEmail(email model.Email) error {
 
 	err := repo.dialer.DialAndSend(mailer)
 	if err != nil {
-		logrus.Errorf("[repository][email_repository] error when sent email, ", err)
+		logrus.Errorf("[repository][email_repository] error when sent email: %v", err)
 		return err
 	}
 
