@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/config"
-	KafkaDelivery "github.com/sjuliper7/silhouette/services/profile-service/delivery/http/kafka"
+	KafkaDelivery "github.com/sjuliper7/silhouette/services/profile-service/delivery/message_broker/kafka"
 	repository "github.com/sjuliper7/silhouette/services/profile-service/repository/mysql"
 	"github.com/sjuliper7/silhouette/services/profile-service/usecase"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -51,7 +51,7 @@ func (profileService *ProfileService) startKafka() (err error) {
 	})
 
 	if err != nil {
-		logrus.Errorf("[config][initKafka] Error while create consumer", err)
+		logrus.Errorf("[config][initKafka] Error while create consumer: %v", err)
 	} else {
 		logrus.Infof("[config][initKafka] Success while create consumer")
 	}
@@ -70,7 +70,7 @@ func (profileService *ProfileService) startService() {
 
 	err := KafkaDelivery.Consume(profileService.KafkaConsumer, profileUc)
 	if err != nil {
-		logrus.Println("[config][service] failed to start consuming from kafka")
+		logrus.Println("[config][service] failed to start consuming from kafka: %v", err)
 	}
 
 	//next running the to http

@@ -31,7 +31,7 @@ func Consume(kafkaConsumer *kafka.Consumer, profileUsecase usecase.ProfileUseCas
 		for {
 			msg, err := kafkaService.kafkaConsumer.ReadMessage(-1)
 			if err != nil {
-				logger.Errf("[delivery][kafka][NewKafkaHandler] portfolio error occured on consumer %s, detail: %v (%v)", "", err, msg)
+				logger.Errf("[delivery][NewKafkaHandler]  error consumer %s, detail: %v (%v)", "", err, msg)
 				continue
 			}
 			kafkaService.messageHandler(msg)
@@ -49,7 +49,7 @@ func (kafkaService kafkaDelivery) messageHandler(message *kafka.Message) {
 		topic = *message.TopicPartition.Topic
 	}
 
-	logrus.Infof("Receive message from kafka topic %v", topic)
+	logrus.Infof("Receive message from kafka topic: %v", topic)
 
 	switch {
 	case topic == string(constans.TopicUserRegistration):
@@ -63,6 +63,6 @@ func (kafkaService kafkaDelivery) messageHandler(message *kafka.Message) {
 	}
 
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("[delivery] error when process message: ", err)
 	}
 }

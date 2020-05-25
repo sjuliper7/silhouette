@@ -12,6 +12,7 @@ type mysqlRepository struct {
 	Conn *sqlx.DB
 }
 
+//NewMysqlProfileRepository ...
 func NewMysqlProfileRepository(conn *sqlx.DB) repository.Repository {
 	return &mysqlRepository{Conn: conn}
 }
@@ -22,7 +23,7 @@ func (profileRepository *mysqlRepository) Get(userID int64) (profile models.Prof
 	rows, err := profileRepository.Conn.Queryx(sql, userID)
 
 	if err != nil {
-		logrus.Errorf("[profileRepository][Get] error when queries %v", err)
+		logrus.Errorf("[profileRepository][Get] error when queries: %v", err)
 		return profile, nil
 	}
 
@@ -33,7 +34,7 @@ func (profileRepository *mysqlRepository) Get(userID int64) (profile models.Prof
 
 		err := rows.StructScan(&temp)
 		if err != nil {
-			logrus.Errorf("[profileRepository][Get] error when scanning values %v", err)
+			logrus.Errorf("[profileRepository][Get] error when scanning values: %v", err)
 			return profile, nil
 		}
 
@@ -55,7 +56,7 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 
 	tx, err := profileRepository.Conn.Beginx()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Add] error creating transactions, %v", err)
+		logrus.Errorf("[profileRepository][Add] error creating transactions: %v", err)
 		return err
 	}
 
@@ -66,7 +67,7 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 	stmt, err := tx.Preparex(sql)
 
 	if err != nil {
-		logrus.Errorf("[profileRepository][Add] error when preparing query, %v", err)
+		logrus.Errorf("[profileRepository][Add] error when preparing query: %v", err)
 		return err
 	}
 
@@ -82,14 +83,14 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 	)
 
 	if err != nil {
-		logrus.Errorf("[profileRepository][Add] error when inserting values, %v", err)
+		logrus.Errorf("[profileRepository][Add] error when inserting values: %v", err)
 		return err
 	}
 
 	var temp int64
 	temp, err = result.LastInsertId()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Add] error when inserting values, %v ", err)
+		logrus.Errorf("[profileRepository][Add] error when inserting values: %v ", err)
 		return err
 	}
 
@@ -97,10 +98,10 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 
 	err = tx.Commit()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Add] error when commit transaction, %v", err)
+		logrus.Errorf("[profileRepository][Add] error when commit transaction: %v", err)
 	}
 
-	logrus.Infof("[profileRepository][Add] successfully to add : %v", profile.ID)
+	logrus.Infof("[profileRepository][Add] successfully to add: %v", profile.ID)
 
 	return nil
 }
@@ -110,7 +111,7 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 
 	tx, err := profileRepository.Conn.Beginx()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Update] error when creating transaction, %v", err)
+		logrus.Errorf("[profileRepository][Update] error when creating transaction: %v", err)
 		return nil
 	}
 
@@ -120,7 +121,7 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 
 	stmt, err := tx.Preparex(sql)
 	if err != nil {
-		logrus.Errorf("[profileRepository][Update] error when prepare the query, %v", err)
+		logrus.Errorf("[profileRepository][Update] error when prepare the query: %v", err)
 		return err
 	}
 
@@ -136,17 +137,17 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 	)
 
 	if err != nil {
-		logrus.Errorf("[profileRepository][Update] error when exec the query with value, %v", err)
+		logrus.Errorf("[profileRepository][Update] error when exec the query with value: %v", err)
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Update] error when commit transaction, %v", err)
+		logrus.Errorf("[profileRepository][Update] error when commit transaction: %v", err)
 		return nil
 	}
 
-	logrus.Infof("[profileRepository][Update] successfully to updated : %v", profile.ID)
+	logrus.Infof("[profileRepository][Update] successfully to updated: %v", profile.ID)
 
 	return nil
 }
@@ -154,7 +155,7 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 func (profileRepository *mysqlRepository) Delete(userID int64) (deleted bool, err error) {
 	tx, err := profileRepository.Conn.Beginx()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Delete] error when creating transaction, %v", err)
+		logrus.Errorf("[profileRepository][Delete] error when creating transaction: %v", err)
 		return false, err
 	}
 
@@ -164,23 +165,23 @@ func (profileRepository *mysqlRepository) Delete(userID int64) (deleted bool, er
 
 	stmt, err := tx.Preparex(sql)
 	if err != nil {
-		logrus.Errorf("[profileRepository][Delete] error when prepare the query, %v", err)
+		logrus.Errorf("[profileRepository][Delete] error when prepare the query: %v", err)
 		return false, err
 	}
 	_, err = stmt.Exec(userID)
 
 	if err != nil {
-		logrus.Errorf("[profileRepository][Delete] error when exec the query with value, %v ", err)
+		logrus.Errorf("[profileRepository][Delete] error when exec the query with value: %v ", err)
 		return false, err
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		logrus.Errorf("[profileRepository][Delete] error when commit transaction, %v", err)
+		logrus.Errorf("[profileRepository][Delete] error when commit transaction: %v", err)
 		return false, err
 	}
 
-	logrus.Infof("[profileRepository][Delete] successfully to deleted profile user id : %v", userID)
+	logrus.Infof("[profileRepository][Delete] successfully to deleted profile user id: %v", userID)
 
 	return true, nil
 }

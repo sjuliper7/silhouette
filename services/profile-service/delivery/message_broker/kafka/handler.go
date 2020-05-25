@@ -26,7 +26,7 @@ func (kafkaService kafkaDelivery) createProfile(message *kafka.Message) (err err
 
 	err = kafkaService.profileUsecase.Add(profile)
 	if err != nil {
-		logrus.Errorf("[kafka-handler][createProfile] error when creating profile %v", err)
+		logrus.Errorf("[kafka-handler][createProfile] error when creating profile: %v", err)
 		return err
 	}
 
@@ -54,7 +54,7 @@ func (kafkaService kafkaDelivery) updateProfile(message *kafka.Message) (err err
 	err = kafkaService.profileUsecase.Update(profile)
 
 	if err != nil {
-		logrus.Println("[kafka-handler][updateProfile] error when updating profile", err)
+		logrus.Println("[kafka-handler][updateProfile] error when updating profile: %v", err)
 		return err
 	}
 
@@ -70,7 +70,7 @@ func (kafkaService kafkaDelivery) deleteProfile(message *kafka.Message) (err err
 	err = kafkaService.profileUsecase.Delete(int64(profile.UserId))
 
 	if err != nil {
-		logrus.Errorf("[kafka-handler][updateProfile] error when deleting profile %v", err)
+		logrus.Errorf("[kafka-handler][updateProfile] error when deleting profile: %v", err)
 		return err
 	}
 

@@ -12,12 +12,13 @@ type kafkaRepository struct {
 	kafkaProducer *kafka.Producer
 }
 
+//NewKafkaRepository ...
 func NewKafkaRepository(kafkaProducer *kafka.Producer) repository.KafkaRepository {
 	return &kafkaRepository{kafkaProducer: kafkaProducer}
 }
 
 func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (err error) {
-	logrus.Infof("publishing message to kafka, topic :%v", topic)
+	logrus.Infof("publishing message to kafka, topic: %v", topic)
 	deliverChan := make(chan kafka.Event)
 
 	go func() {
@@ -30,7 +31,7 @@ func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (
 		}, deliverChan)
 
 		if err != nil {
-			logrus.Errorf("[kafka-repository][PublishMessage] error while producing, %v", err)
+			logrus.Errorf("[kafka-repository][PublishMessage] error while producing: %v", err)
 			deliverChan <- nil
 		}
 	}()
@@ -45,11 +46,11 @@ func (kafkaRepo *kafkaRepository) PublishMessage(topic string, message []byte) (
 
 	if msg.TopicPartition.Error != nil {
 		err = errors.New("error while publish kafka message")
-		logrus.Errorf("[kafka-repository][PublishMessage] %v, ", err)
+		logrus.Errorf("[kafka-repository][PublishMessage] %v: ", err)
 		return err
 	}
 
-	logrus.Infof("success publish message to kafka, topic :%v", topic)
+	logrus.Infof("success publish message to kafka, topic: %v", topic)
 
 	return nil
 }
