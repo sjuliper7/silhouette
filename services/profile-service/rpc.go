@@ -16,7 +16,7 @@ func initRemoteProcedurCall(db *sqlx.DB, kafkaConsumer *kafka.Consumer, profileU
 
 	svr := grpc.NewServer()
 	models.RegisterProfilesServer(svr, profileServer)
-	logrus.Infof("starting RPC server at %v", config.SERVICE_PROFILE_PORT)
+	logrus.Infof("starting profile-service at %v", config.SERVICE_PROFILE_PORT)
 
 	return svr
 }

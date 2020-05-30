@@ -83,6 +83,8 @@ func (nfs *NotificationService) startService() {
 		logrus.Println("[config] failed to start consuming from kafka")
 	}
 
+	logrus.Infof("starting notification service at %v", config.SERVICE_NOTIFICATION_PORT)
+
 	http.ListenAndServe(config.SERVICE_NOTIFICATION_PORT, LoadRouter())
 
 }

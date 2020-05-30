@@ -11,13 +11,13 @@ type userMysqlRepository struct {
 	Conn *sqlx.DB
 }
 
-//NewMysqlRepository is to create new instance repository
+//NewUserMysqlRepository is to create new instance repository
 func NewUserMysqlRepository(conn *sqlx.DB) repository.UserRepository {
 	return &userMysqlRepository{conn}
 }
 
 func (repo *userMysqlRepository) GetAll() (users []models.UserTable, err error) {
-	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true`
+	sql := `SELECT id, username, email, role, is_active, created_at, updated_at FROM users where is_active = true`
 	rows, err := repo.Conn.Queryx(sql)
 	if err != nil {
 		logrus.Errorf("[user-repository][GetAll] error while querying: %v", err)
@@ -48,7 +48,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 
 	defer tx.Rollback()
 
-	sql := `INSERT INTO users(username, email, name, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
+	sql := `INSERT INTO users(username, email, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
 	stmt, err := tx.Preparex(sql)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 		return err
 	}
 
-	result, err := stmt.Exec(user.Username, user.Email, user.Name, user.Role, user.CreatedAt, user.UpdatedAt)
+	result, err := stmt.Exec(user.Username, user.Email, user.Role, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		logrus.Errorf("[user-repository][Add] error when inserting values: %v", err)
 		return err
@@ -84,7 +84,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 
 func (repo *userMysqlRepository) Get(userID int64) (user models.UserTable, err error) {
 
-	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true and id = ?`
+	sql := `SELECT id, username, email, role, is_active, created_at, updated_at FROM users where is_active = true and id = ?`
 	stmt, err := repo.Conn.Preparex(sql)
 
 	if err != nil {
@@ -110,7 +110,7 @@ func (repo *userMysqlRepository) Update(user *models.UserTable) (err error) {
 
 	defer tx.Rollback()
 
-	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
+	sql := `UPDATE users SET username = ?, email = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
 
 	stmt, err := tx.Preparex(sql)
 	if err != nil {
@@ -120,7 +120,6 @@ func (repo *userMysqlRepository) Update(user *models.UserTable) (err error) {
 
 	_, err = stmt.Exec(user.Username,
 		user.Email,
-		user.Name,
 		user.Role,
 		user.IsActive,
 		user.CreatedAt,

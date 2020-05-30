@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/services/user-service/usecase"
 )
 
@@ -24,6 +25,7 @@ func NewUserServerRest(uc usecase.UserUsecase) UserService {
 
 //Resource ...
 func (userServerRest UserService) Resource(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("req: %s%s\n", r.Host, r.URL.Path)
 	switch m := r.Method; m {
 	case http.MethodGet:
 		params := mux.Vars(r)

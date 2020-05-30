@@ -73,7 +73,7 @@ func startService() {
 	var userService UserService
 	userService.initDatabase()
 	userService.initKafka()
-	logrus.Infof("Starting Rest API at %v", commonsConfig.REST_USER_PORT)
+	logrus.Infof("Starting Rest API at %v", commonsConfig.SERVICE_USER_PORT)
 
-	http.ListenAndServe(commonsConfig.REST_USER_PORT, initRouter(userService.DB, userService.KafkaProducer))
+	http.ListenAndServe(commonsConfig.SERVICE_USER_PORT, initRouter(userService.DB, userService.KafkaProducer))
 }
