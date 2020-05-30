@@ -21,7 +21,7 @@ func (profileServer ProfileService) GetProfile(ctx context.Context, params *mode
 
 	var profile *models.Profile = &models.Profile{}
 	profile.ID = pf.ID
-	profile.UserID = pf.UserId
+	profile.UserID = pf.UserID
 	profile.Address = pf.Address
 	profile.WorkAt = pf.WorkAt
 	profile.PhoneNumber = pf.PhoneNumber

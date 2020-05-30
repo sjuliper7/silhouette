@@ -47,7 +47,7 @@ func (profileService *ProfileService) startKafka() (err error) {
 
 	profileService.KafkaConsumer, err = kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "127.0.0.1",
-		"group.id":          "silhouette",
+		"group.id":          "silhouette#1",
 	})
 
 	if err != nil {

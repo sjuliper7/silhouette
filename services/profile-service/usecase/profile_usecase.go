@@ -45,7 +45,7 @@ func (profileUsecase *profileUsecase) Add(profile models.ProfileTable) (err erro
 
 func (profileUsecase *profileUsecase) Update(profile models.ProfileTable) (err error) {
 
-	pf, err := profileUsecase.profileRepository.Get(profile.UserId)
+	pf, err := profileUsecase.profileRepository.Get(profile.UserID)
 
 	if err != nil {
 		logrus.Errorf("[usecase][GetProfile] error when calling get user [profileRepository][Get]: %v ", err)

@@ -24,7 +24,7 @@ func (us UserService) List(context.Context, *empty.Empty) (*models.UserList, err
 		user.ID = uint64(u.ID)
 		user.Email = u.Email
 		user.Username = u.Username
-		user.Name = u.Name
+		// user.Name = u.Name
 		user.Role = u.Role
 
 		users = append(users, &user)

@@ -34,7 +34,7 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 		user.ID = u.ID
 		user.Username = u.Username
 		user.Email = u.Email
-		user.Name = u.Name
+		// user.Name = u.Name
 		user.Role = u.Role
 		user.CreatedAt = u.CreatedAt.String()
 		user.UpdatedAt = u.UpdatedAt.String()
@@ -52,11 +52,10 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 }
 
 func (uc userUsecase) Add(user *models.User) (err error) {
-
 	userTable := models.UserTable{
-		Username:  user.Username,
-		Email:     user.Email,
-		Name:      user.Name,
+		Username: user.Username,
+		Email:    user.Email,
+		// Name:      user.Name,
 		Role:      user.Role,
 		IsActive:  1,
 		CreatedAt: time.Now(),
@@ -77,6 +76,9 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 		"work_at":      user.Profile.WorkAt,
 		"phone_number": user.Profile.PhoneNumber,
 		"gender":       user.Profile.Gender,
+		"email":        user.Email,
+		"type":         "email",
+		"name":         user.Profile.Name,
 	}
 
 	jsonData, err := json.Marshal(message)
@@ -108,7 +110,7 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	user.Role = ut.Role
 	user.Username = ut.Username
 	user.Email = ut.Email
-	user.Name = ut.Name
+	// user.Name = ut.Name
 	user.ID = ut.ID
 	user.CreatedAt = ut.CreatedAt.String()
 	user.UpdatedAt = ut.UpdatedAt.String()
@@ -138,7 +140,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	userTable.Role = us.Role
 	userTable.Email = us.Email
 	userTable.Username = us.Username
-	userTable.Name = us.Name
+	// userTable.Name = us.Name
 	userTable.UpdatedAt = time.Now()
 
 	err = uc.userRepo.Update(&userTable)

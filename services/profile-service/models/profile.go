@@ -7,7 +7,8 @@ import (
 
 type ProfileTable struct {
 	ID          int64     `db:"id" json:"id"`
-	UserId      int64     `db:"user_id" json:"user_id"`
+	UserID      int64     `db:"user_id" json:"user_id"`
+	Name        string    `db:"name" json:"name"`
 	Address     string    `db:"address" json:"address"`
 	WorkAt      string    `db:"work_at" json:"work_at"`
 	PhoneNumber string    `db:"phone_number" json:"phone_number"`
@@ -19,7 +20,8 @@ type ProfileTable struct {
 
 type PortfolioTableScanner struct {
 	ID          sql.NullInt64  `db:"id"`
-	UserId      sql.NullInt64  `db:"user_id"`
+	UserID      sql.NullInt64  `db:"user_id"`
+	Name        sql.NullString `db:"name"`
 	Address     sql.NullString `db:"address"`
 	WorkAt      sql.NullString `db:"work_at"`
 	PhoneNumber sql.NullString `db:"phone_number"`
@@ -31,7 +33,8 @@ type PortfolioTableScanner struct {
 
 type OutputKafkaProfile struct {
 	ID          int64  `json:"id"`
-	UserId      int64  `json:"user_id"`
+	UserID      int64  `json:"user_id"`
+	Name        string `json:"name"`
 	Address     string `json:"address"`
 	WorkAt      string `json:"work_at"`
 	PhoneNumber string `json:"phone_number"`

@@ -26,21 +26,48 @@ func NewUserServerRest(uc usecase.UserUsecase) UserService {
 //Resource ...
 func (userServerRest UserService) Resource(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("req: %s%s\n", r.Host, r.URL.Path)
+
 	switch m := r.Method; m {
 	case http.MethodGet:
 		params := mux.Vars(r)
+		var result interface{}
+		var err error
 		if len(params) == 0 {
-			userServerRest.fetchUser(w, r)
+			result, err = userServerRest.fetchUser(w, r)
 		} else {
-			userServerRest.getUser(w, r)
+			result, err = userServerRest.getUser(w, r)
 		}
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			break
+		}
+		respondWithJSON(w, http.StatusOK, result)
+
 	case http.MethodPost:
-		userServerRest.postUser(w, r)
+		result, err := userServerRest.postUser(w, r)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			break
+		}
+		respondWithJSON(w, http.StatusOK, result)
 	case http.MethodPut:
-		userServerRest.updateUser(w, r)
+		result, err := userServerRest.updateUser(w, r)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			break
+		}
+		respondWithJSON(w, http.StatusOK, result)
+
 	case http.MethodDelete:
-		userServerRest.deleteUser(w, r)
+		result, err := userServerRest.deleteUser(w, r)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			break
+		}
+		respondWithJSON(w, http.StatusOK, result)
+
 	default:
 		respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
+
 }

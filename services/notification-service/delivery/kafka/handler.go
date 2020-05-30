@@ -27,6 +27,8 @@ func (kafkaSvc kafkaDelivery) processingMessage(message *kafka.Message) error {
 		return err
 	}
 
+	logrus.Infof("payload: %v", notification)
+
 	if topic == string(constans.TopicUserRegistration) {
 		err = kafkaSvc.notificationCase.AccountRegisterNotification(notification)
 	} else if topic == string(constans.TopicUserUpdated) {

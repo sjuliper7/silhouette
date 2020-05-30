@@ -22,11 +22,12 @@ func NewProfileRepository() (repository.ProfileRepository, error) {
 	conn, err := grpc.Dial(profilePort, grpc.WithInsecure())
 
 	if err != nil {
-		logrus.Fatalln("Could not connect to profile service: %v", profilePort)
+		logrus.Errorf("Could not connect to profile service: %v", profilePort)
 		return nil, err
 	}
 
 	repo.clientProfile = models2.NewProfilesClient(conn)
+	logrus.Infof("Yay connected to profile services...")
 
 	return repo, nil
 }

@@ -30,5 +30,7 @@ func (repo *emailRepository) SentEmail(email model.Email) error {
 		return err
 	}
 
+	logrus.Infof("Yay email have sent to, %v", email.Receivers)
+
 	return nil
 }

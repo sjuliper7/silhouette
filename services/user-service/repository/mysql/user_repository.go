@@ -48,7 +48,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 
 	defer tx.Rollback()
 
-	sql := `INSERT INTO users(username, email, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
+	sql := `INSERT INTO users(username, email, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
 	stmt, err := tx.Preparex(sql)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 		return err
 	}
 
-	result, err := stmt.Exec(user.Username, user.Email, user.Role, user.CreatedAt, user.UpdatedAt)
+	result, err := stmt.Exec(user.Username, user.Email, user.Role, user.IsActive, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		logrus.Errorf("[user-repository][Add] error when inserting values: %v", err)
 		return err

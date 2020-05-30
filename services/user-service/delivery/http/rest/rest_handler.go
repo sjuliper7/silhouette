@@ -9,21 +9,21 @@ import (
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 )
 
-func (userServerRest UserService) fetchUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) fetchUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	users, err := userServerRest.usecase.GetAll()
 	if err != nil {
 		logrus.Errorf("[delivery][fetchUser] error when call [user-usecase][GetAll], %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
-	respondWithJSON(w, http.StatusOK, users)
+	return users, nil
 }
 
-func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+
 	var user = models.User{
 		Username: r.FormValue("username"),
 		Email:    r.FormValue("email"),
-		Name:     r.FormValue("name"),
 		Role:     r.FormValue("role"),
 	}
 
@@ -32,6 +32,7 @@ func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Reques
 		WorkAt:      r.FormValue("work_at"),
 		PhoneNumber: r.FormValue("phone_number"),
 		Gender:      r.FormValue("gender"),
+		Name:        r.FormValue("name"),
 	}
 
 	user.Profile = profile
@@ -40,44 +41,44 @@ func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Reques
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
 	user, err = userServerRest.usecase.Get(user.ID)
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
-	respondWithJSON(w, http.StatusOK, user)
+	return user, nil
 }
 
-func (userServerRest UserService) getUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) getUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
 		logrus.Errorf("error when casting params to int, %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
 	user, err := userServerRest.usecase.Get(int64(id))
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Get], %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
-	respondWithJSON(w, http.StatusOK, user)
+	return user, nil
 }
 
-func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
 		logrus.Errorf("Error when casting getting user %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
 	user := models.User{}
@@ -85,7 +86,7 @@ func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Requ
 	user.ID = int64(id)
 	user.Username = r.FormValue("username")
 	user.Email = r.FormValue("email")
-	user.Name = r.FormValue("name")
+	// user.Name = r.FormValue("name")
 	user.Role = r.FormValue("role")
 
 	profile := models.Profile{
@@ -102,27 +103,27 @@ func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Requ
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Update], %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
-	respondWithJSON(w, http.StatusOK, user)
+	return user, nil
 }
 
-func (userServerRest UserService) deleteUser(w http.ResponseWriter, r *http.Request) {
+func (userServerRest UserService) deleteUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
 	if err != nil {
 		logrus.Errorf("Error when casting getting user , %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
 	deleted, err := userServerRest.usecase.Delete(int64(id))
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Delete], %v", err)
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return nil, err
 	}
 
-	respondWithJSON(w, http.StatusOK, deleted)
+	return deleted, nil
 }

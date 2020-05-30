@@ -18,11 +18,12 @@ func (kafkaService kafkaDelivery) createProfile(message *kafka.Message) (err err
 
 	profile := models.ProfileTable{}
 	profile.IsActive = true
+	profile.Name = outputProfile.Name
 	profile.Gender = outputProfile.Gender
 	profile.PhoneNumber = outputProfile.PhoneNumber
 	profile.WorkAt = outputProfile.WorkAt
 	profile.Address = outputProfile.Address
-	profile.UserId = outputProfile.UserId
+	profile.UserID = outputProfile.UserID
 
 	err = kafkaService.profileUsecase.Add(profile)
 	if err != nil {
@@ -42,8 +43,9 @@ func (kafkaService kafkaDelivery) updateProfile(message *kafka.Message) (err err
 	helper.CheckError(err)
 
 	profile := models.ProfileTable{
-		UserId:      temp.UserId,
+		UserID:      temp.UserID,
 		Address:     temp.Address,
+		Name:        temp.Name,
 		WorkAt:      temp.WorkAt,
 		PhoneNumber: temp.PhoneNumber,
 		Gender:      temp.Gender,
@@ -67,7 +69,7 @@ func (kafkaService kafkaDelivery) deleteProfile(message *kafka.Message) (err err
 	err = json.Unmarshal(message.Value, &profile)
 	helper.CheckError(err)
 
-	err = kafkaService.profileUsecase.Delete(int64(profile.UserId))
+	err = kafkaService.profileUsecase.Delete(int64(profile.UserID))
 
 	if err != nil {
 		logrus.Errorf("[kafka-handler][updateProfile] error when deleting profile: %v", err)
