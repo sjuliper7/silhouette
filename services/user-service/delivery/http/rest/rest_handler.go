@@ -33,6 +33,7 @@ func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Reques
 		PhoneNumber: r.FormValue("phone_number"),
 		Gender:      r.FormValue("gender"),
 		Name:        r.FormValue("name"),
+		DateOfBirth: r.FormValue("date_of_birth"),
 	}
 
 	user.Profile = profile
@@ -86,7 +87,6 @@ func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Requ
 	user.ID = int64(id)
 	user.Username = r.FormValue("username")
 	user.Email = r.FormValue("email")
-	// user.Name = r.FormValue("name")
 	user.Role = r.FormValue("role")
 
 	profile := models.Profile{
@@ -95,6 +95,8 @@ func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Requ
 		WorkAt:      r.FormValue("work_at"),
 		PhoneNumber: r.FormValue("phone_number"),
 		Gender:      r.FormValue("gender"),
+		Name:        r.FormValue("name"),
+		DateOfBirth: r.FormValue("date_of_birth"),
 	}
 
 	user.Profile = profile

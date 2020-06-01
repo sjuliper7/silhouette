@@ -18,7 +18,7 @@ func NewMysqlProfileRepository(conn *sqlx.DB) repository.Repository {
 }
 
 func (profileRepository *mysqlRepository) Get(userID int64) (profile models.ProfileTable, err error) {
-	sql := `SELECT id, user_id, name, address, work_at, phone_number, gender, created_at, updated_at FROM profiles WHERE user_id = ? and is_active = 1`
+	sql := `SELECT id, user_id, name, address, work_at, phone_number, gender, date_of_birth, created_at, updated_at FROM profiles WHERE user_id = ? and is_active = 1`
 
 	rows, err := profileRepository.Conn.Queryx(sql, userID)
 
@@ -47,6 +47,8 @@ func (profileRepository *mysqlRepository) Get(userID int64) (profile models.Prof
 		profile.UserID = temp.UserID.Int64
 		profile.CreatedAt = helper.ParseStringToTime(temp.CreatedAt.String)
 		profile.UpdatedAt = helper.ParseStringToTime(temp.UpdatedAt.String)
+		profile.Name = temp.Name.String
+		profile.DateOfBirth = temp.DateOfBirth.String
 	}
 
 	return profile, nil
@@ -62,7 +64,7 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 
 	defer tx.Rollback()
 
-	sql := `INSERT INTO profiles(user_id, name, address, work_at, phone_number, gender, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	sql := `INSERT INTO profiles(user_id, name, address, work_at, phone_number, gender, date_of_birth, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	stmt, err := tx.Preparex(sql)
 
@@ -78,6 +80,7 @@ func (profileRepository *mysqlRepository) Add(profile *models.ProfileTable) (err
 		profile.WorkAt,
 		profile.PhoneNumber,
 		profile.Gender,
+		profile.DateOfBirth,
 		profile.IsActive,
 		profile.CreatedAt,
 		profile.UpdatedAt,
@@ -118,7 +121,7 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 
 	defer tx.Rollback()
 
-	sql := `UPDATE profiles SET user_id = ?, name = ?, address = ?, work_at = ?, phone_number = ?, gender = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
+	sql := `UPDATE profiles SET user_id = ?, name = ?, address = ?, work_at = ?, phone_number = ?, gender = ?, date_of_birth = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
 
 	stmt, err := tx.Preparex(sql)
 	if err != nil {
@@ -127,12 +130,12 @@ func (profileRepository *mysqlRepository) Update(profile *models.ProfileTable) (
 	}
 
 	_, err = stmt.Exec(profile.UserID,
-		profile.UserID,
 		profile.Name,
 		profile.Address,
 		profile.WorkAt,
 		profile.PhoneNumber,
 		profile.Gender,
+		profile.DateOfBirth,
 		profile.IsActive,
 		profile.CreatedAt,
 		profile.UpdatedAt,

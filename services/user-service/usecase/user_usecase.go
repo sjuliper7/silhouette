@@ -71,14 +71,15 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 	user.ID = userTable.ID
 
 	message := map[string]interface{}{
-		"user_id":      userTable.ID,
-		"address":      user.Profile.Address,
-		"work_at":      user.Profile.WorkAt,
-		"phone_number": user.Profile.PhoneNumber,
-		"gender":       user.Profile.Gender,
-		"email":        user.Email,
-		"type":         "email",
-		"name":         user.Profile.Name,
+		"user_id":       userTable.ID,
+		"address":       user.Profile.Address,
+		"work_at":       user.Profile.WorkAt,
+		"phone_number":  user.Profile.PhoneNumber,
+		"gender":        user.Profile.Gender,
+		"email":         user.Email,
+		"type":          "email",
+		"name":          user.Profile.Name,
+		"date_of_birth": user.Profile.DateOfBirth,
 	}
 
 	jsonData, err := json.Marshal(message)
@@ -130,6 +131,8 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 
 func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 
+	logrus.Infof("params: %v", us)
+
 	userTable, err := uc.userRepo.Get(int64(us.ID))
 
 	if err != nil {
@@ -140,7 +143,6 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	userTable.Role = us.Role
 	userTable.Email = us.Email
 	userTable.Username = us.Username
-	// userTable.Name = us.Name
 	userTable.UpdatedAt = time.Now()
 
 	err = uc.userRepo.Update(&userTable)
@@ -151,11 +153,15 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	}
 
 	message := map[string]interface{}{
-		"user_id":      userTable.ID,
-		"address":      us.Profile.Address,
-		"work_at":      us.Profile.WorkAt,
-		"phone_number": us.Profile.PhoneNumber,
-		"gender":       us.Profile.Gender,
+		"user_id":       userTable.ID,
+		"address":       us.Profile.Address,
+		"work_at":       us.Profile.WorkAt,
+		"phone_number":  us.Profile.PhoneNumber,
+		"gender":        us.Profile.Gender,
+		"email":         us.Email,
+		"type":          "email",
+		"name":          us.Profile.Name,
+		"date_of_birth": us.Profile.DateOfBirth,
 	}
 
 	jsonData, err := json.Marshal(message)

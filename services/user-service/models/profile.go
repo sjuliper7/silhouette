@@ -9,6 +9,7 @@ type Profile struct {
 	WorkAt      string `json:"work_at"`
 	PhoneNumber string `json:"phone_number"`
 	Gender      string `json:"gender"`
+	DateOfBirth string `json:"date_of_birth"`
 	IsActive    bool   `json:"is_active"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`

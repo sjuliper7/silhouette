@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package protocs;
+package models;
+
+option go_package = "";
 
 message User{
     uint64 ID = 1;

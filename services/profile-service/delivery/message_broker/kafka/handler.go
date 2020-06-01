@@ -24,6 +24,7 @@ func (kafkaService kafkaDelivery) createProfile(message *kafka.Message) (err err
 	profile.WorkAt = outputProfile.WorkAt
 	profile.Address = outputProfile.Address
 	profile.UserID = outputProfile.UserID
+	profile.DateOfBirth = outputProfile.DateOfBirth
 
 	err = kafkaService.profileUsecase.Add(profile)
 	if err != nil {
@@ -49,6 +50,7 @@ func (kafkaService kafkaDelivery) updateProfile(message *kafka.Message) (err err
 		WorkAt:      temp.WorkAt,
 		PhoneNumber: temp.PhoneNumber,
 		Gender:      temp.Gender,
+		DateOfBirth: temp.DateOfBirth,
 		IsActive:    true,
 		UpdatedAt:   time.Now(),
 	}

@@ -52,6 +52,8 @@ func (repo profileRepository) Get(userID int64) (profile models.Profile, err err
 	profile.UserID = rProfile.UserID
 	profile.CreatedAt = rProfile.CreatedAt
 	profile.UpdatedAt = rProfile.UpdatedAt
+	profile.Name = rProfile.Name
+	profile.DateOfBirth = rProfile.DateOfBirth
 
 	return profile, nil
 }

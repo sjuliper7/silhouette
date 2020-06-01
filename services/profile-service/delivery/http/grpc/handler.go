@@ -29,6 +29,8 @@ func (profileServer ProfileService) GetProfile(ctx context.Context, params *mode
 	profile.IsActive = pf.IsActive
 	profile.CreatedAt = pf.CreatedAt.String()
 	profile.UpdatedAt = pf.UpdatedAt.String()
+	profile.Name = pf.Name
+	profile.DateOfBirth = pf.DateOfBirth
 
 	return profile, nil
 }

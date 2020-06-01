@@ -1,7 +1,8 @@
 syntax = "proto3";
 
-package protocs;
+package models;
 
+option go_package = "";
 
 message Profile{
     int64 ID = 1;
@@ -13,6 +14,8 @@ message Profile{
     bool IsActive = 7;
     string CreatedAt = 8;
     string UpdatedAt = 9;
+    string Name = 10;
+    string DateOfBirth = 11;
 }
 
 message UserGetProfileArguments {
