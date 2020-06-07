@@ -18,24 +18,25 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-//NewUserServerRest ...
-func NewUserServerRest(uc usecase.UserUsecase) UserService {
+//NewUserDelivery ...
+func NewUserDelivery(uc usecase.UserUsecase) UserService {
 	return UserService{usecase: uc}
 }
 
 //Resource ...
-func (userServerRest UserService) Resource(w http.ResponseWriter, r *http.Request) {
+func (handler *UserService) Resource(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("req: %s%s\n", r.Host, r.URL.Path)
 
 	switch m := r.Method; m {
 	case http.MethodGet:
 		params := mux.Vars(r)
+		logrus.Infof("params: %v", params)
 		var result interface{}
 		var err error
 		if len(params) == 0 {
-			result, err = userServerRest.fetchUser(w, r)
+			result, err = handler.fetchUser(w, r)
 		} else {
-			result, err = userServerRest.getUser(w, r)
+			result, err = handler.getUser(w, r)
 		}
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -44,14 +45,14 @@ func (userServerRest UserService) Resource(w http.ResponseWriter, r *http.Reques
 		respondWithJSON(w, http.StatusOK, result)
 
 	case http.MethodPost:
-		result, err := userServerRest.postUser(w, r)
+		result, err := handler.postUser(w, r)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			break
 		}
 		respondWithJSON(w, http.StatusOK, result)
 	case http.MethodPut:
-		result, err := userServerRest.updateUser(w, r)
+		result, err := handler.updateUser(w, r)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			break
@@ -59,7 +60,7 @@ func (userServerRest UserService) Resource(w http.ResponseWriter, r *http.Reques
 		respondWithJSON(w, http.StatusOK, result)
 
 	case http.MethodDelete:
-		result, err := userServerRest.deleteUser(w, r)
+		result, err := handler.deleteUser(w, r)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			break

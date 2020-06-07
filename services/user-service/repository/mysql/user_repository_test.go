@@ -1,233 +1,293 @@
 package mysql
 
 import (
+	"reflect"
+	"regexp"
+	"testing"
+	"time"
+
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
+	"github.com/sjuliper7/silhouette/services/user-service/models"
+	"github.com/stretchr/testify/assert"
 )
 
 type fields struct {
-	DB *sqlx.DB
+	DB   *sqlx.DB
+	User *models.UserTable
 }
 
-// func TestMysqlRepository_GetAll(t *testing.T) {
+func TestGetAll(t *testing.T) {
 
-// 	tMock := time.Now()
+	tMock := time.Now()
 
-// 	mockDb, mock, err := sqlmock.New()
+	mockDb, mock, err := sqlmock.New()
 
-// 	if err != nil {
-// 		t.Error("Failed mock db")
-// 	}
+	if err != nil {
+		t.Error("Failed to mock db")
+	}
 
-// 	sx := sqlx.NewDb(mockDb, "mockdb")
+	sx := sqlx.NewDb(mockDb, "mockdb")
 
-// 	sql := `SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true`
-// 	rgxQuery := regexp.QuoteMeta(sql)
+	sql := `SELECT id, username, email, role, is_active, created_at, updated_at FROM users where is_active = true`
+	rgxQuery := regexp.QuoteMeta(sql)
 
-// 	test := []struct {
-// 		Name   string
-// 		Fields fields
-// 		Want   []models.UserTable
-// 	}{
-// 		{
-// 			Name:   "Test-1",
-// 			Fields: fields{DB: sx},
-// 			Want: []models.UserTable{
-// 				models.UserTable{
-// 					ID:        1,
-// 					Username:  "sjuliper7",
-// 					Email:     "sjuliper7@gmail.com",
-// 					Name:      "Juliper Simanjuntak",
-// 					Role:      "user",
-// 					IsActive:  1,
-// 					CreatedAt: tMock,
-// 					UpdatedAt: tMock,
-// 				},
-// 				models.UserTable{
-// 					ID:        2,
-// 					Username:  "yesica",
-// 					Email:     "yesica@gmail.com",
-// 					Name:      "Yesica Tampubolon",
-// 					Role:      "user",
-// 					IsActive:  1,
-// 					CreatedAt: tMock,
-// 					UpdatedAt: tMock,
-// 				},
-// 			},
-// 		},
-// 	}
+	test := []struct {
+		Name   string
+		Fields fields
+		Want   []models.UserTable
+	}{
+		{
+			Name:   "success-test",
+			Fields: fields{DB: sx},
+			Want: []models.UserTable{
+				models.UserTable{
+					ID:        1,
+					Username:  "sjuliper7",
+					Email:     "sjuliper7@gmail.com",
+					Role:      "user",
+					IsActive:  1,
+					CreatedAt: tMock,
+					UpdatedAt: tMock,
+				},
+				models.UserTable{
+					ID:        2,
+					Username:  "yesica",
+					Email:     "yesica@gmail.com",
+					Role:      "user",
+					IsActive:  1,
+					CreatedAt: tMock,
+					UpdatedAt: tMock,
+				},
+			},
+		},
+	}
 
-// 	for _, tt := range test {
-// 		repo := userMysqlRepository{Conn: tt.Fields.DB}
+	for _, tt := range test {
+		t.Run(tt.Name, func(t *testing.T) {
+			repo := NewUserMysqlRepository(tt.Fields.DB)
 
-// 		rows := sqlmock.NewRows([]string{"id", "username", "email", "name", "role", "is_active", "created_at", "updated_at"}).
-// 			AddRow(1, "sjuliper7", "sjuliper7@gmail.com", "Juliper Simanjuntak", "user", 1, tMock, tMock).
-// 			AddRow(2, "yesica", "yesica@gmail.com", "Yesica Tampubolon", "user", 1, tMock, tMock)
+			rows := sqlmock.NewRows([]string{"id", "username", "email", "role", "is_active", "created_at", "updated_at"}).
+				AddRow(1, "sjuliper7", "sjuliper7@gmail.com", "user", 1, tMock, tMock).
+				AddRow(2, "yesica", "yesica@gmail.com", "user", 1, tMock, tMock)
 
-// 		mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
+			mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
 
-// 		resultMock, err := repo.GetAll()
-// 		if err != nil {
-// 			t.Errorf("Error When call GetAllUser")
-// 		}
+			resultMock, err := repo.GetAll()
+			if err != nil {
+				t.Errorf("Error When call GetAllUser")
+			}
 
-// 		if !reflect.DeepEqual(resultMock, tt.Want) {
-// 			t.Errorf("workRepo.GetAllWork() = %v, want %v", resultMock, tt.Want)
-// 		}
-// 	}
+			if !reflect.DeepEqual(resultMock, tt.Want) {
+				t.Errorf("workRepo.GetAllWork() = %v, want %v", resultMock, tt.Want)
+			}
+		})
+	}
+}
 
-// }
+func TestAdd(t *testing.T) {
+	tMock := time.Now()
 
-// func TestMysqlRepository_Add(t *testing.T) {
-// 	mockDB, mock, err := sqlmock.New()
+	mockDB, mock, err := sqlmock.New()
 
-// 	if err != nil {
-// 		t.Error("Failed mock db")
-// 	}
+	if err != nil {
+		t.Error("Failed to mock db")
+	}
 
-// 	sx := sqlx.NewDb(mockDB, "mockdb")
+	sx := sqlx.NewDb(mockDB, "mockdb")
 
-// 	sql := `INSERT INTO users(username, email, name, role) VALUES (?, ?, ?, ?)`
-// 	rgxQuery := regexp.QuoteMeta(sql)
+	sql := `INSERT INTO users(username, email, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
+	rgxQuery := regexp.QuoteMeta(sql)
 
-// 	t.Run("Test-1", func(t *testing.T) {
-// 		user := models.UserTable{
-// 			ID:       0,
-// 			Username: "sjuliper8",
-// 			Email:    "sjuliper8@gmail.com",
-// 			Name:     "JuliperS",
-// 			Role:     "admin",
-// 		}
+	user := &models.UserTable{
+		ID:        0,
+		Username:  "sjuliper8",
+		Email:     "sjuliper8@gmail.com",
+		Role:      "admin",
+		IsActive:  1,
+		CreatedAt: tMock,
+		UpdatedAt: tMock,
+	}
 
-// 		mock.ExpectPrepare(rgxQuery)
-// 		mock.ExpectExec(rgxQuery).WithArgs(user.Username, user.Email, user.Name, user.Role).
-// 			WillReturnResult(sqlmock.NewResult(1, 1))
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: fields{DB: sx, User: user},
+		},
+	}
 
-// 		r := &userMysqlRepository{Conn: sx}
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
 
-// 		err := r.Add(&user)
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, uint64(1), user.ID)
-// 	})
-// }
+			u := tt.Fields.User
 
-// func TestUserMysqlRepository_Update(t *testing.T) {
-// 	tMock := time.Now()
-// 	dbMock, mock, err := sqlmock.New()
+			mock.ExpectBegin()
+			mock.ExpectPrepare(rgxQuery)
+			mock.ExpectExec(rgxQuery).WithArgs(u.Username, u.Email, u.Role, u.IsActive, u.CreatedAt, u.UpdatedAt).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			mock.ExpectCommit()
 
-// 	if err != nil {
-// 		t.Error("Failed mock db")
-// 	}
+			r := NewUserMysqlRepository(tt.Fields.DB)
 
-// 	user := models.UserTable{
-// 		ID:        1,
-// 		Username:  "sjuliper7",
-// 		Email:     "sjuliper7@gmail.com",
-// 		Name:      "Juliper Simanjuntak",
-// 		Role:      "user",
-// 		IsActive:  1,
-// 		CreatedAt: tMock,
-// 		UpdatedAt: tMock,
-// 	}
+			err := r.Add(tt.Fields.User)
+			assert.NoError(t, err)
+			assert.Equal(t, int64(1), user.ID)
+		})
+	}
+}
 
-// 	sx := sqlx.NewDb(dbMock, "mockdb")
+func TestUpdate(t *testing.T) {
+	tMock := time.Now()
+	dbMock, mock, err := sqlmock.New()
 
-// 	sql := `UPDATE users SET username = ?, email = ?, name = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
-// 	rgxQuery := regexp.QuoteMeta(sql)
+	if err != nil {
+		t.Error("Failed to mock db")
+	}
 
-// 	t.Run("Test-1", func(t *testing.T) {
-// 		repo := &userMysqlRepository{Conn: sx}
+	user := &models.UserTable{
+		ID:        1,
+		Username:  "sjuliper7",
+		Email:     "sjuliper7@gmail.com",
+		Role:      "user",
+		IsActive:  1,
+		CreatedAt: tMock,
+		UpdatedAt: tMock,
+	}
 
-// 		mock.ExpectPrepare(rgxQuery)
-// 		mock.ExpectExec(rgxQuery).WithArgs(user.Username,
-// 			user.Email,
-// 			user.Name,
-// 			user.Role,
-// 			user.IsActive,
-// 			user.CreatedAt,
-// 			user.UpdatedAt,
-// 			user.ID).
-// 			WillReturnResult(sqlmock.NewResult(1, 1))
+	sx := sqlx.NewDb(dbMock, "mockdb")
 
-// 		err := repo.Update(&user)
-// 		assert.NoError(t, err)
-// 	})
+	sql := `UPDATE users SET username = ?, email = ?, role = ?, is_active = ? ,created_at = ?, updated_at = ? WHERE id=?`
+	rgxQuery := regexp.QuoteMeta(sql)
 
-// }
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: fields{DB: sx, User: user},
+		},
+	}
 
-// func TestMysqlRepository_Get(t *testing.T) {
-// 	tMock := time.Now()
-// 	mockDb, mock, err := sqlmock.New()
-// 	sx := sqlx.NewDb(mockDb, "mockbd")
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			u := tt.Fields.User
+			repo := NewUserMysqlRepository(tt.Fields.DB)
 
-// 	if err != nil {
-// 		t.Error("Failed mock db")
-// 		return
-// 	}
+			mock.ExpectBegin()
+			mock.ExpectPrepare(rgxQuery)
+			mock.ExpectExec(rgxQuery).WithArgs(u.Username,
+				u.Email,
+				u.Role,
+				u.IsActive,
+				u.CreatedAt,
+				u.UpdatedAt,
+				u.ID).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			mock.ExpectCommit()
 
-// 	rgxQuery := "SELECT id, username, email, name, role, is_active, created_at, updated_at FROM users where is_active = true and id = (.+)"
+			err := repo.Update(tt.Fields.User)
+			assert.NoError(t, err)
+		})
 
-// 	tests := []struct {
-// 		name   string
-// 		fields fields
-// 		want   models.UserTable
-// 	}{
-// 		{
-// 			name:   "test-1",
-// 			fields: fields{DB: sx},
-// 			want: models.UserTable{
-// 				ID:        1,
-// 				Username:  "sjuliper",
-// 				Email:     "simanjuntak.juliper@outlook.com",
-// 				Name:      "Juliper Simanjuntak",
-// 				Role:      "admin",
-// 				IsActive:  1,
-// 				CreatedAt: tMock,
-// 				UpdatedAt: tMock,
-// 			},
-// 		},
-// 	}
+	}
+}
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			r := &userMysqlRepository{
-// 				Conn: tt.fields.DB,
-// 			}
+func TestGet(t *testing.T) {
+	tMock := time.Now()
 
-// 			rows := sqlmock.NewRows([]string{"id", "username", "email", "name", "role", "is_active", "created_at", "updated_at"}).
-// 				AddRow(1, "sjuliper", "simanjuntak.juliper@outlook.com", "Juliper Simanjuntak", "admin", 1, tMock, tMock)
+	mockDb, mock, err := sqlmock.New()
+	sx := sqlx.NewDb(mockDb, "mockbd")
 
-// 			mock.ExpectPrepare(rgxQuery)
-// 			mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
+	if err != nil {
+		t.Error("Failed to mock db")
+		return
+	}
 
-// 			if got, _ := r.Get(1); !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("mysqlRepository.GetUser(userID) = %v, want %v", got, tt.want)
-// 			}
+	sql := `SELECT id, username, email, role, is_active, created_at, updated_at FROM users where is_active = true and id = ?`
+	rgxQuery := regexp.QuoteMeta(sql)
 
-// 		})
-// 	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   models.UserTable
+	}{
+		{
+			name:   "success-test",
+			fields: fields{DB: sx},
+			want: models.UserTable{
+				ID:        1,
+				Username:  "sjuliper",
+				Email:     "simanjuntak.juliper@outlook.com",
+				Role:      "admin",
+				IsActive:  1,
+				CreatedAt: tMock,
+				UpdatedAt: tMock,
+			},
+		},
+	}
 
-// }
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := NewUserMysqlRepository(tt.fields.DB)
 
-// func TestUserMysqlRepository_DeleteUser(t *testing.T) {
-// 	dbMock, mock, err := sqlmock.New()
+			rows := sqlmock.NewRows([]string{"id", "username", "email", "role", "is_active", "created_at", "updated_at"}).
+				AddRow(1, "sjuliper", "simanjuntak.juliper@outlook.com", "admin", 1, tMock, tMock)
 
-// 	sx := sqlx.NewDb(dbMock, "mockdb")
+			mock.ExpectPrepare(rgxQuery)
+			mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
 
-// 	if err != nil {
-// 		t.Error("Failed mock db")
-// 	}
+			if got, _ := r.Get(1); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("mysqlRepository.GetUser(userID) = %v, want %v", got, tt.want)
+			}
 
-// 	sql := `UPDATE users SET is_active = false where id =?`
-// 	rgxQuery := regexp.QuoteMeta(sql)
+		})
+	}
+}
 
-// 	t.Run("Test-delete-1", func(t *testing.T) {
-// 		repo := userMysqlRepository{Conn: sx}
+func TestUserMysqlRepository_DeleteUser(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
 
-// 		prep := mock.ExpectPrepare(rgxQuery)
-// 		prep.ExpectExec().WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1))
+	sx := sqlx.NewDb(dbMock, "mockdb")
 
-// 		_, err := repo.Delete(1)
+	if err != nil {
+		t.Error("Failed to mock db")
+	}
 
-// 		assert.NoError(t, err)
-// 	})
-// }
+	sql := `UPDATE users SET is_active = false where id =?`
+	rgxQuery := regexp.QuoteMeta(sql)
+
+	user := &models.UserTable{
+		ID: 1,
+	}
+
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: fields{DB: sx, User: user},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			u := tt.Fields.User
+			repo := NewUserMysqlRepository(tt.Fields.DB)
+
+			mock.ExpectBegin()
+			prep := mock.ExpectPrepare(rgxQuery)
+			prep.ExpectExec().WithArgs(u.ID).WillReturnResult(sqlmock.NewResult(1, 1))
+			mock.ExpectCommit()
+
+			_, err := repo.Delete(1)
+
+			assert.NoError(t, err)
+		})
+	}
+
+}

@@ -1,69 +1,340 @@
 package usecase
 
-// func TestUserUsecase_GetAllUser(t *testing.T) {
-// 	mockUserRepo := new(mocks.UserRepositoryMock)
+import (
+	"reflect"
+	"testing"
+	"time"
 
-// 	mockListUser := make([]models.UserTable, 0)
-// 	mockUser := models.UserTable{
-// 		ID:        1,
-// 		Username:  "mock",
-// 		Email:     "mock@gmail.com",
-// 		Name:      "mock-test",
-// 		Role:      "mock-role",
-// 		IsActive:  1,
-// 		CreatedAt: time.Time{},
-// 		UpdatedAt: time.Time{},
-// 	}
+	"github.com/sjuliper7/silhouette/services/user-service/models"
+	"github.com/sjuliper7/silhouette/services/user-service/repository/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
 
-// 	mockListUser = append(mockListUser, mockUser)
+type fields struct {
+	Users      []models.User
+	User       models.User
+	UserTable  models.UserTable
+	Profile    models.Profile
+	UserTables []models.UserTable
+	ID         int64
+}
 
-// 	t.Run("success", func(t *testing.T) {
-// 		mockUserRepo.On("GetAll").Return(
-// 			mockListUser,
-// 			nil).
-// 			Once()
+func TestGetAllUser(t *testing.T) {
+	tMock := time.Now()
 
-// 		mockProfile := models.Profile{
-// 			ID:          1,
-// 			Address:     "mock-address",
-// 			WorkAt:      "mock-work-at",
-// 			PhoneNumber: "082272194654",
-// 			Gender:      "Male",
-// 		}
+	userTables := []models.UserTable{
+		{
+			ID:        1,
+			Username:  "mock",
+			Email:     "mock@gmail.com",
+			Role:      "mock-role",
+			IsActive:  1,
+			CreatedAt: tMock,
+			UpdatedAt: tMock,
+		},
+	}
 
-// 		mockProfileRepo := new(mocks.ProfileServiceMock)
-// 		mockProfileRepo.On("Get", mock.AnythingOfType("int64")).Return(mockProfile, nil)
+	profile := models.Profile{
+		ID:          1,
+		UserID:      1,
+		Address:     "Lumban Bulbul",
+		Name:        "Juliper Simanjuntak",
+		WorkAt:      "Start Up Companny",
+		PhoneNumber: "082272194654",
+		Gender:      "Laki Laki",
+		DateOfBirth: "19/07/1997",
+		CreatedAt:   tMock.String(),
+		UpdatedAt:   tMock.String(),
+	}
 
-// 		mockKafkaRepo := new(mocks.KafkaRepositoryMock)
+	users := []models.User{
+		{
+			ID:        1,
+			Username:  "mock",
+			Email:     "mock@gmail.com",
+			Role:      "mock-role",
+			CreatedAt: tMock.String(),
+			UpdatedAt: tMock.String(),
+			Profile:   profile,
+		},
+	}
 
-// 		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo, mockKafkaRepo)
+	successFields := fields{
+		Users:      users,
+		UserTables: userTables,
+		Profile:    profile,
+	}
 
-// 		listOfUser, err := userCase.GetAll()
-// 		assert.NoError(t, err)
-// 		assert.Len(t, listOfUser, len(mockListUser))
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: successFields,
+		},
+	}
 
-// 		mockUserRepo.AssertExpectations(t)
-// 		mockProfileRepo.AssertExpectations(t)
-// 	})
-// }
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			mockRepo := new(mocks.UserRepositoryMock)
+			mockProfileService := new(mocks.ProfileServiceMock)
+			mockKafkaRepository := new(mocks.KafkaRepositoryMock)
 
-// 	t.Run("error-failed", func(t *testing.T) {
-// 		uu := make([]models.UserTable, 0)
-// 		mockUserRepo.On("GetAll").Return(
-// 			uu,
-// 			errors.New("unexpected error")).
-// 			Once()
+			mockRepo.On("GetAll").Return(tt.Fields.UserTables, nil)
+			mockProfileService.On("Get", mock.AnythingOfType("int64")).Return(tt.Fields.Profile, nil)
 
-// 		mockProfileRepo := new(mocks.ProfileServiceMock)
-// 		mockKafkaRepo := new(mocks.KafkaRepositoryMock)
+			userCase := NewUserUsecase(mockRepo, mockProfileService, mockKafkaRepository)
+			got, err := userCase.GetAll()
 
-// 		userCase := NewUserUsecase(mockUserRepo, mockProfileRepo, mockKafkaRepo)
-// 		listOfUser, err := userCase.GetAll()
-// 		assert.NoError(t, err)
-// 		assert.Len(t, listOfUser, 0)
+			assert.NoError(t, err)
+			assert.Len(t, got, len(tt.Fields.Users))
+			if !reflect.DeepEqual(got, tt.Fields.Users) {
+				t.Errorf("TestGetAll = %v, want %v", got, tt.Fields.Users)
+			}
 
-// 		mockUserRepo.AssertExpectations(t)
-// 		mockProfileRepo.AssertExpectations(t)
-// 	})
+		})
+	}
+}
 
-// }
+func TestAdd(t *testing.T) {
+	tMock := time.Now()
+	userTable := models.UserTable{
+		Username:  "mock",
+		Email:     "mock@gmail.com",
+		Role:      "mock-role",
+		IsActive:  1,
+		CreatedAt: tMock,
+		UpdatedAt: tMock,
+	}
+
+	profile := models.Profile{
+		UserID:      1,
+		Address:     "Lumban Bulbul",
+		Name:        "Juliper Simanjuntak",
+		WorkAt:      "Start Up Companny",
+		PhoneNumber: "082272194654",
+		Gender:      "Laki Laki",
+		DateOfBirth: "19/07/1997",
+		CreatedAt:   tMock.String(),
+		UpdatedAt:   tMock.String(),
+	}
+
+	user := models.User{
+		Username:  "mock",
+		Email:     "mock@gmail.com",
+		Role:      "mock-role",
+		CreatedAt: tMock.String(),
+		UpdatedAt: tMock.String(),
+		Profile:   profile,
+	}
+
+	successFields := fields{
+		User:      user,
+		UserTable: userTable,
+	}
+
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: successFields,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			mockRepo := new(mocks.UserRepositoryMock)
+			mockProfileService := new(mocks.ProfileServiceMock)
+			mockKafkaRepository := new(mocks.KafkaRepositoryMock)
+
+			mockRepo.On("Add", mock.AnythingOfType("*models.UserTable")).Return(nil)
+			mockKafkaRepository.On("PublishMessage", mock.AnythingOfType("string"), mock.AnythingOfType("[]uint8")).Return(nil)
+
+			userCase := NewUserUsecase(mockRepo, mockProfileService, mockKafkaRepository)
+			err := userCase.Add(&tt.Fields.User)
+
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestGet(t *testing.T) {
+	tMock := time.Now()
+
+	userTable := models.UserTable{
+		ID:        1,
+		Username:  "mock",
+		Email:     "mock@gmail.com",
+		Role:      "mock-role",
+		IsActive:  1,
+		CreatedAt: tMock,
+		UpdatedAt: tMock,
+	}
+
+	profile := models.Profile{
+		ID:          1,
+		UserID:      1,
+		Address:     "Lumban Bulbul",
+		Name:        "Juliper Simanjuntak",
+		WorkAt:      "Start Up Companny",
+		PhoneNumber: "082272194654",
+		Gender:      "Laki Laki",
+		DateOfBirth: "19/07/1997",
+		CreatedAt:   tMock.String(),
+		UpdatedAt:   tMock.String(),
+	}
+
+	user := models.User{
+		ID:        1,
+		Username:  "mock",
+		Email:     "mock@gmail.com",
+		Role:      "mock-role",
+		CreatedAt: tMock.String(),
+		UpdatedAt: tMock.String(),
+		Profile:   profile,
+	}
+
+	successFields := fields{
+		User:      user,
+		UserTable: userTable,
+		Profile:   profile,
+		ID:        1,
+	}
+
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: successFields,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			mockRepo := new(mocks.UserRepositoryMock)
+			mockProfileService := new(mocks.ProfileServiceMock)
+			mockKafkaRepository := new(mocks.KafkaRepositoryMock)
+
+			mockRepo.On("Get", mock.AnythingOfType("int64")).Return(tt.Fields.UserTable, nil)
+			mockProfileService.On("Get", mock.AnythingOfType("int64")).Return(tt.Fields.Profile, nil)
+
+			userCase := NewUserUsecase(mockRepo, mockProfileService, mockKafkaRepository)
+			got, err := userCase.Get(tt.Fields.ID)
+
+			assert.NoError(t, err)
+			if !reflect.DeepEqual(got, tt.Fields.User) {
+				t.Errorf("TestGet() = %v, want %v", got, tt.Fields.Users)
+			}
+
+		})
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	tMock := time.Now()
+	userTables := []models.UserTable{
+		{
+			ID:        1,
+			Username:  "mock-update",
+			Email:     "mock@gmail.com",
+			Role:      "mock-role",
+			IsActive:  1,
+			CreatedAt: tMock,
+			UpdatedAt: tMock,
+		},
+	}
+
+	profile := models.Profile{
+		UserID:      1,
+		Address:     "Lumban Bulbul",
+		Name:        "Juliper Simanjuntak Update",
+		WorkAt:      "Start Up Companny",
+		PhoneNumber: "082272194654",
+		Gender:      "Laki Laki",
+		DateOfBirth: "19/07/1997",
+		CreatedAt:   tMock.String(),
+		UpdatedAt:   tMock.String(),
+	}
+
+	users := []models.User{
+		{
+			Username:  "mock",
+			Email:     "mock@gmail.com",
+			Role:      "mock-role",
+			CreatedAt: tMock.String(),
+			UpdatedAt: tMock.String(),
+			Profile:   profile,
+		},
+	}
+
+	successFields := fields{
+		Users:      users,
+		UserTables: userTables,
+	}
+
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: successFields,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			mockRepo := new(mocks.UserRepositoryMock)
+			mockProfileService := new(mocks.ProfileServiceMock)
+			mockKafkaRepository := new(mocks.KafkaRepositoryMock)
+
+			mockRepo.On("Update", mock.AnythingOfType("*models.UserTable")).Return(nil)
+			mockRepo.On("Get", mock.AnythingOfType("int64")).Return(tt.Fields.UserTable, nil)
+			mockKafkaRepository.On("PublishMessage", mock.AnythingOfType("string"), mock.AnythingOfType("[]uint8")).Return(nil)
+			mockProfileService.On("Get", mock.AnythingOfType("int64")).Return(tt.Fields.Profile, nil)
+
+			userCase := NewUserUsecase(mockRepo, mockProfileService, mockKafkaRepository)
+			_, err := userCase.Update(tt.Fields.User)
+
+			assert.NoError(t, err)
+
+		})
+	}
+}
+
+func TestDelete(t *testing.T) {
+
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: fields{ID: 1},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			mockRepo := new(mocks.UserRepositoryMock)
+			mockProfileService := new(mocks.ProfileServiceMock)
+			mockKafkaRepository := new(mocks.KafkaRepositoryMock)
+
+			mockRepo.On("Delete", mock.AnythingOfType("int64")).Return(true, nil)
+			mockKafkaRepository.On("PublishMessage", mock.AnythingOfType("string"), mock.AnythingOfType("[]uint8")).Return(nil)
+
+			userCase := NewUserUsecase(mockRepo, mockProfileService, mockKafkaRepository)
+			_, err := userCase.Delete(tt.Fields.ID)
+
+			assert.NoError(t, err)
+
+		})
+	}
+
+}

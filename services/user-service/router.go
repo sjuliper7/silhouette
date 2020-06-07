@@ -25,7 +25,7 @@ func initRouter(db *sqlx.DB, kafka *kafka.Producer) *mux.Router {
 	}
 
 	profileUsecase := usecase.NewUserUsecase(userRepo, profileRepo, kafkaRepo)
-	userRest := rest.NewUserServerRest(profileUsecase)
+	userRest := rest.NewUserDelivery(profileUsecase)
 
 	router := mux.NewRouter()
 	v1 := router.PathPrefix("/api/v1").Subrouter()

@@ -5,12 +5,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+//KafkaRepositoryMock ...
 type KafkaRepositoryMock struct {
 	mock.Mock
 }
 
-func (m *KafkaRepositoryMock) PublishMessage(topic string, message []byte) (err error) {
-	logrus.Infof("publish message to topic:  %v message: %v", topic, string(message))
+// PublishMessage ...
+func (m *KafkaRepositoryMock) PublishMessage(topic string, message []uint8) (err error) {
+	logrus.Infof("publish message...")
 	args := m.Called(topic, message)
-	return args.Error(1)
+	return args.Error(0)
 }

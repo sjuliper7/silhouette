@@ -9,8 +9,8 @@ import (
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 )
 
-func (userServerRest UserService) fetchUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	users, err := userServerRest.usecase.GetAll()
+func (handler UserService) fetchUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	users, err := handler.usecase.GetAll()
 	if err != nil {
 		logrus.Errorf("[delivery][fetchUser] error when call [user-usecase][GetAll], %v", err)
 		return nil, err
@@ -19,7 +19,7 @@ func (userServerRest UserService) fetchUser(w http.ResponseWriter, r *http.Reque
 	return users, nil
 }
 
-func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (handler UserService) postUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 
 	var user = models.User{
 		Username: r.FormValue("username"),
@@ -38,14 +38,14 @@ func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Reques
 
 	user.Profile = profile
 
-	err := userServerRest.usecase.Add(&user)
+	err := handler.usecase.Add(&user)
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
 		return nil, err
 	}
 
-	user, err = userServerRest.usecase.Get(user.ID)
+	user, err = handler.usecase.Get(user.ID)
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Add], %v", err)
 		return nil, err
@@ -54,7 +54,7 @@ func (userServerRest UserService) postUser(w http.ResponseWriter, r *http.Reques
 	return user, nil
 }
 
-func (userServerRest UserService) getUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (handler UserService) getUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -63,7 +63,7 @@ func (userServerRest UserService) getUser(w http.ResponseWriter, r *http.Request
 		return nil, err
 	}
 
-	user, err := userServerRest.usecase.Get(int64(id))
+	user, err := handler.usecase.Get(int64(id))
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Get], %v", err)
@@ -73,7 +73,7 @@ func (userServerRest UserService) getUser(w http.ResponseWriter, r *http.Request
 	return user, nil
 }
 
-func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (handler UserService) updateUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -101,7 +101,7 @@ func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Requ
 
 	user.Profile = profile
 
-	user, err = userServerRest.usecase.Update(user)
+	user, err = handler.usecase.Update(user)
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Update], %v", err)
@@ -111,7 +111,7 @@ func (userServerRest UserService) updateUser(w http.ResponseWriter, r *http.Requ
 	return user, nil
 }
 
-func (userServerRest UserService) deleteUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (handler UserService) deleteUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 
@@ -120,7 +120,7 @@ func (userServerRest UserService) deleteUser(w http.ResponseWriter, r *http.Requ
 		return nil, err
 	}
 
-	deleted, err := userServerRest.usecase.Delete(int64(id))
+	deleted, err := handler.usecase.Delete(int64(id))
 
 	if err != nil {
 		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Delete], %v", err)
