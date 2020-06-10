@@ -45,3 +45,10 @@ func (m *UserRepositoryMock) Delete(userID int64) (deleted bool, err error) {
 	args := m.Called(userID)
 	return args.Bool(0), args.Error(1)
 }
+
+//GetByEmail ...
+func (m *UserRepositoryMock) GetByEmail(email string) (user models.UserTable, err error) {
+	logrus.Infof("get user by email...")
+	args := m.Called(email)
+	return args.Get(0).(models.UserTable), args.Error(1)
+}

@@ -2,12 +2,14 @@ package usecase
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sjuliper7/silhouette/commons/constans"
 	"github.com/sjuliper7/silhouette/services/user-service/models"
 	"github.com/sjuliper7/silhouette/services/user-service/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userUsecase struct {
@@ -18,10 +20,10 @@ type userUsecase struct {
 
 //NewUserUsecase ...
 func NewUserUsecase(userRepo repository.UserRepository, profileRepo repository.ProfileRepository, kafkaRepo repository.KafkaRepository) UserUsecase {
-	return userUsecase{userRepo, profileRepo, kafkaRepo}
+	return &userUsecase{userRepo, profileRepo, kafkaRepo}
 }
 
-func (uc userUsecase) GetAll() (users []models.User, err error) {
+func (uc *userUsecase) GetAll() (users []models.User, err error) {
 	usersTable, err := uc.userRepo.GetAll()
 
 	if err != nil {
@@ -51,11 +53,18 @@ func (uc userUsecase) GetAll() (users []models.User, err error) {
 	return users, err
 }
 
-func (uc userUsecase) Add(user *models.User) (err error) {
+func (uc *userUsecase) Add(user *models.User) (err error) {
+
+	password, err := hashPassword(user.Password)
+	if err != nil {
+		logrus.Errorf("[usecase][Add] failed when hash password: %v", err)
+		return err
+	}
+
 	userTable := models.UserTable{
-		Username: user.Username,
-		Email:    user.Email,
-		// Name:      user.Name,
+		Username:  user.Username,
+		Email:     user.Email,
+		Password:  password,
 		Role:      user.Role,
 		IsActive:  1,
 		CreatedAt: time.Now(),
@@ -99,7 +108,7 @@ func (uc userUsecase) Add(user *models.User) (err error) {
 	return nil
 }
 
-func (uc userUsecase) Get(userID int64) (user models.User, err error) {
+func (uc *userUsecase) Get(userID int64) (user models.User, err error) {
 	ut := models.UserTable{}
 	ut, err = uc.userRepo.Get(userID)
 
@@ -129,7 +138,7 @@ func (uc userUsecase) Get(userID int64) (user models.User, err error) {
 	return user, nil
 }
 
-func (uc userUsecase) Update(us models.User) (user models.User, err error) {
+func (uc *userUsecase) Update(us models.User) (user models.User, err error) {
 
 	logrus.Infof("params: %v", us)
 
@@ -187,7 +196,7 @@ func (uc userUsecase) Update(us models.User) (user models.User, err error) {
 	return user, nil
 }
 
-func (uc userUsecase) Delete(userID int64) (deleted bool, err error) {
+func (uc *userUsecase) Delete(userID int64) (deleted bool, err error) {
 	deleted, err = uc.userRepo.Delete(userID)
 
 	if err != nil {
@@ -228,4 +237,34 @@ func (uc *userUsecase) fillProfileDetails(users []models.User) ([]models.User, e
 		users[i].Profile = profile
 	}
 	return users, nil
+}
+
+func (uc *userUsecase) Login(user *models.User) (string, error) {
+	var result string
+	logrus.Infof("email: %v", user.Email)
+	u, err := uc.userRepo.GetByEmail(user.Email)
+	if err != nil {
+		logrus.Errorf("[usecase][Login] Error when calling [repository][GetByEmail]: %v", err)
+		return result, err
+	}
+
+	logrus.Infof("password: %v", user.Password)
+
+	if comparePassword(user.Password, u.Password) {
+		result = fmt.Sprintf("Welcome %s, We happy for you", u.Username)
+	} else {
+		result = "Email or password is wrong, please try again!"
+	}
+
+	return result, nil
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func comparePassword(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

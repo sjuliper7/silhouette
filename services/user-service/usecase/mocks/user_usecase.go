@@ -45,3 +45,10 @@ func (m *UserUsecaseMock) Delete(userID int64) (deleted bool, err error) {
 	args := m.Called(userID)
 	return args.Bool(0), args.Error(1)
 }
+
+//Login
+func (m *UserUsecaseMock) Login(user *models.User) (string, error) {
+	logrus.Infof("login...")
+	args := m.Called(user)
+	return args.String(0), args.Error(1)
+}

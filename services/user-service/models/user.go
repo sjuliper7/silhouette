@@ -7,6 +7,7 @@ type User struct {
 	ID        int64   `json:"id"`
 	Username  string  `json:"username"`
 	Email     string  `json:"email"`
+	Password  string  `json:"omitempty"`
 	Role      string  `json:"role"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt string  `json:"updated_at"`
@@ -17,6 +18,7 @@ type User struct {
 type UserTable struct {
 	ID        int64     `db:"id"`
 	Username  string    `db:"username"`
+	Password  string    `db:"password"`
 	Email     string    `db:"email"`
 	Role      string    `db:"role"`
 	IsActive  int       `db:"is_active"`

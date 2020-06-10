@@ -338,3 +338,53 @@ func TestDelete(t *testing.T) {
 	}
 
 }
+
+func TestLogin(t *testing.T) {
+
+	tMock := time.Now()
+
+	userTable := models.UserTable{
+		ID:        1,
+		Username:  "mock",
+		Email:     "mock@gmail.com",
+		Password:  "bycrypt(ganteng)",
+		Role:      "mock-role",
+		IsActive:  1,
+		CreatedAt: tMock,
+		UpdatedAt: tMock,
+	}
+
+	successFields := fields{
+		UserTable: userTable,
+	}
+
+	tests := []struct {
+		Name   string
+		Fields fields
+	}{
+		{
+			Name:   "success-test",
+			Fields: successFields,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			mockRepo := new(mocks.UserRepositoryMock)
+			mockProfileService := new(mocks.ProfileServiceMock)
+			mockKafkaRepository := new(mocks.KafkaRepositoryMock)
+
+			mockRepo.On("GetByEmail", mock.AnythingOfType("string")).Return(tt.Fields.UserTable, nil)
+
+			userMock := models.User{
+				Email:    "mock@gmail.com",
+				Password: "ganteng",
+			}
+			userCase := NewUserUsecase(mockRepo, mockProfileService, mockKafkaRepository)
+			_, err := userCase.Login(&userMock)
+			assert.NoError(t, err)
+
+		})
+	}
+
+}

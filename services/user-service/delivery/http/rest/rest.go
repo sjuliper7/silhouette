@@ -2,6 +2,7 @@ package rest
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -45,11 +46,23 @@ func (handler *UserService) Resource(w http.ResponseWriter, r *http.Request) {
 		respondWithJSON(w, http.StatusOK, result)
 
 	case http.MethodPost:
-		result, err := handler.postUser(w, r)
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			break
+		var result interface{}
+		var err error
+
+		if strings.Split(r.URL.Path, "/")[3] == "login" {
+			result, err = handler.login(w, r)
+			if err != nil {
+				respondWithError(w, http.StatusInternalServerError, err.Error())
+				break
+			}
+		} else {
+			result, err = handler.postUser(w, r)
+			if err != nil {
+				respondWithError(w, http.StatusInternalServerError, err.Error())
+				break
+			}
 		}
+
 		respondWithJSON(w, http.StatusOK, result)
 	case http.MethodPut:
 		result, err := handler.updateUser(w, r)

@@ -33,6 +33,8 @@ func initRouter(db *sqlx.DB, kafka *kafka.Producer) *mux.Router {
 
 	v1.HandleFunc("/users", userRest.Resource).Methods("GET", "POST")
 	v1.HandleFunc("/users/{id}", userRest.Resource).Methods("GET", "PUT", "DELETE")
+	v1.HandleFunc("/register", userRest.Resource).Methods("POST")
+	v1.HandleFunc("/login", userRest.Resource).Methods("POST")
 
 	return router
 }

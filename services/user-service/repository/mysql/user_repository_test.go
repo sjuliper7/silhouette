@@ -96,7 +96,7 @@ func TestAdd(t *testing.T) {
 
 	sx := sqlx.NewDb(mockDB, "mockdb")
 
-	sql := `INSERT INTO users(username, email, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
+	sql := `INSERT INTO users(password, username, email, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	rgxQuery := regexp.QuoteMeta(sql)
 
 	user := &models.UserTable{
@@ -126,7 +126,7 @@ func TestAdd(t *testing.T) {
 
 			mock.ExpectBegin()
 			mock.ExpectPrepare(rgxQuery)
-			mock.ExpectExec(rgxQuery).WithArgs(u.Username, u.Email, u.Role, u.IsActive, u.CreatedAt, u.UpdatedAt).
+			mock.ExpectExec(rgxQuery).WithArgs(u.Password, u.Username, u.Email, u.Role, u.IsActive, u.CreatedAt, u.UpdatedAt).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()
 
@@ -248,7 +248,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestUserMysqlRepository_DeleteUser(t *testing.T) {
+func TestDelet(t *testing.T) {
 	dbMock, mock, err := sqlmock.New()
 
 	sx := sqlx.NewDb(dbMock, "mockdb")
@@ -287,6 +287,57 @@ func TestUserMysqlRepository_DeleteUser(t *testing.T) {
 			_, err := repo.Delete(1)
 
 			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestGetByEmail(t *testing.T) {
+	tMock := time.Now()
+	dbMock, mock, err := sqlmock.New()
+
+	sx := sqlx.NewDb(dbMock, "mockdb")
+
+	if err != nil {
+		t.Error("Failed to mock db")
+	}
+
+	sql := `SELECT id, password, username, email, role, is_active, created_at, updated_at FROM users where is_active = true and email = ?`
+	rgxQuery := regexp.QuoteMeta(sql)
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   models.UserTable
+	}{
+		{
+			name:   "success-test",
+			fields: fields{DB: sx},
+			want: models.UserTable{
+				ID:        1,
+				Username:  "sjuliper",
+				Email:     "simanjuntak.juliper@outlook.com",
+				Role:      "admin",
+				IsActive:  1,
+				CreatedAt: tMock,
+				UpdatedAt: tMock,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := NewUserMysqlRepository(tt.fields.DB)
+
+			rows := sqlmock.NewRows([]string{"id", "username", "email", "role", "is_active", "created_at", "updated_at"}).
+				AddRow(1, "sjuliper", "simanjuntak.juliper@outlook.com", "admin", 1, tMock, tMock)
+
+			mock.ExpectPrepare(rgxQuery)
+			mock.ExpectQuery(rgxQuery).WillReturnRows(rows)
+
+			if got, _ := r.GetByEmail("simanjuntak.juliper@outlook.com"); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("mysqlRepository.GetUser(userID) = %v, want %v", got, tt.want)
+			}
+
 		})
 	}
 

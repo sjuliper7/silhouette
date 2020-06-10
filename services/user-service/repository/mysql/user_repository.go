@@ -48,7 +48,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 
 	defer tx.Rollback()
 
-	sql := `INSERT INTO users(username, email, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
+	sql := `INSERT INTO users(password, username, email, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	stmt, err := tx.Preparex(sql)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (repo *userMysqlRepository) Add(user *models.UserTable) (err error) {
 		return err
 	}
 
-	result, err := stmt.Exec(user.Username, user.Email, user.Role, user.IsActive, user.CreatedAt, user.UpdatedAt)
+	result, err := stmt.Exec(user.Password, user.Username, user.Email, user.Role, user.IsActive, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		logrus.Errorf("[user-repository][Add] error when inserting values: %v", err)
 		return err
@@ -173,4 +173,20 @@ func (repo *userMysqlRepository) Delete(userID int64) (deleted bool, err error) 
 
 	logrus.Infof("successfully to deleted user: %v", userID)
 	return true, nil
+}
+
+func (repo *userMysqlRepository) GetByEmail(email string) (user models.UserTable, err error) {
+	sql := `SELECT id, password, username, email, role, is_active, created_at, updated_at FROM users where is_active = true and email = ?`
+	stmt, err := repo.Conn.Preparex(sql)
+
+	if err != nil {
+		logrus.Errorf("[user-repository][Get] error when prepare the query: %v", err)
+	}
+
+	err = stmt.Get(&user, email)
+	if err != nil {
+		logrus.Errorf("[user-repository][Get] error when getting the value: %v", err)
+	}
+
+	return user, nil
 }

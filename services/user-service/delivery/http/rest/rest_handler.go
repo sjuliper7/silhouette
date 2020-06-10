@@ -22,6 +22,7 @@ func (handler UserService) fetchUser(w http.ResponseWriter, r *http.Request) (in
 func (handler UserService) postUser(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 
 	var user = models.User{
+		Password: r.FormValue("password"),
 		Username: r.FormValue("username"),
 		Email:    r.FormValue("email"),
 		Role:     r.FormValue("role"),
@@ -123,9 +124,23 @@ func (handler UserService) deleteUser(w http.ResponseWriter, r *http.Request) (i
 	deleted, err := handler.usecase.Delete(int64(id))
 
 	if err != nil {
-		logrus.Errorf("[delivery][postUser] error when call [user-usecase][Delete], %v", err)
+		logrus.Errorf("[delivery][deleteUser] error when call [user-usecase][Delete], %v", err)
 		return nil, err
 	}
 
 	return deleted, nil
+}
+
+func (handler UserService) login(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	user := models.User{}
+
+	user.Password = r.FormValue("password")
+	user.Email = r.FormValue("email")
+
+	result, err := handler.usecase.Login(&user)
+	if err != nil {
+		logrus.Errorf("[delivery][login] error when call [user-usecase][Login], %v", err)
+		return nil, err
+	}
+	return result, nil
 }
