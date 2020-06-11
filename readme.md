@@ -4,6 +4,8 @@
 ## Descriptions
 This project is a simple project about microservices, the project implementing about `Golang`, `Microservices`, `Clean Arch`, `gRPC`, and `Kafka`, why i use the tech stack because i more familiar.
 
+For clean archtecture is refer to several friend repo and my ex-companny.
+
 ### Preparation
 Here what you need prepare before run the applications:
 1. Docker
