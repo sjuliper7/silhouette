@@ -14,6 +14,7 @@ Here what you need prepare before run the applications:
 1. Docker
 2. Go
 3. Mysql
+4. gRPC
 
 
 ### Run Application
